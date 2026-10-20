@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 
 import numpy as np
 
-PROTOCOL = "cseq-wave/0.1.0"
+PROTOCOL = "cseq-wave/0.2.0"
 
 
 def to_jsonable(obj):
