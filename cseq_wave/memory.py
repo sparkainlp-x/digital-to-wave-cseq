@@ -49,11 +49,12 @@ class HolographicMemory:
     def recall(self, cue, steps=25, track_coherence=True):
         """Evolve a cue wave-state; return (recalled_phases, trajectory).
 
-        trajectory[t] = C_seq alignment of state t with the cue's own
-        start -- replaced by the caller with alignment-vs-target for the
-        fidelity readout. When track_coherence is True we record the
-        self-consistency C_seq(t) = alignment(s_t, s_{t-1}) instead, which
-        rises as the field locks in.
+        When track_coherence is True, trajectory[t] is the step-to-step
+        self-consistency alignment(s_t, s_{t-1}), which approaches 1 once the
+        state stops changing. It measures convergence to *some* fixed point
+        (a stored pattern, a spurious mixture, or the all-zero-phase state
+        of an empty memory). It does not say whether the recalled pattern is
+        the right one. When track_coherence is False the trajectory is empty.
         """
         s = np.exp(1j * np.asarray(cue.phase, dtype=float))
         traj = []
@@ -68,11 +69,11 @@ class HolographicMemory:
     def overlaps(self, cue_phase):
         """Matched-filter scores vs every stored pattern.
 
-        score_mu = |<x^(mu), cue>|^2 / N^2 in [0, 1]. Constructive
-        interference with the right pattern drives its score toward 1;
-        the rest interfere destructively toward 0. This is the
-        "wave-filtering" step: the hologram physically separates the
-        high-probability (stored) response from alternatives.
+        score_mu = |<x^(mu), cue>|^2 / N^2 in [0, 1]. A cue equal to a
+        stored pattern scores 1 for it and about 1/N for random others. A
+        BPSK cue with a fraction p of flipped phases scores about (1 - 2p)^2
+        (0.36 at p = 0.2) for its source pattern, so pass the *recalled*
+        phases to see the post-recall separation.
         """
         q = np.exp(1j * np.asarray(cue_phase, dtype=float))
         scores = []
@@ -87,6 +88,11 @@ class HolographicMemory:
         With slice_output=True (default) the recalled wave is first passed
         through the coherent-receiver slicer, exactly as a BPSK demodulator
         would quantize it before readout.
+
+        Caveats: for BPSK targets the sliced readout equals
+        |2 * bit_accuracy - 1|, so it is blind to a global phase flip (a fully
+        inverted pattern also scores 1.0). Slicing can only raise the score
+        relative to slice_output=False. Report bit accuracy alongside it.
         """
         from .encode import slice_bpsk
 

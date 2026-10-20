@@ -4,10 +4,15 @@ Block score (same form as the address-phase-demo OES32 block score):
 
     S = 0.45 * max|x| + 0.35 * RMS(x) + 0.20 * mean|x|
 
-An event (here: "recall lock-in detected") is declared when S >= 0.50.
-Applied to the coherence trajectory of a recall run, this turns the
-wave computer's analog readout into a discrete detection event --
-the same detection layer used across the OES telemetry work.
+An event is declared when S >= 0.50.
+
+Honest scope: for a signal in [0, 1] the score is at least the mean, and
+the recall self-consistency trajectory sits near 1 after a few steps for
+*any* cue. In a 200-trial synthetic check (N = 256, 5 patterns) the score
+fired on 100% of stored cues, never-stored cues, uniform-noise cues and
+an empty memory. On a recall trajectory, a detection therefore means "the
+dynamics converged", not "the right pattern was recalled". It is kept as a
+fixed-threshold convergence flag, not as a recall check.
 """
 
 import numpy as np

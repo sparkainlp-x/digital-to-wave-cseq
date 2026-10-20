@@ -19,13 +19,14 @@ optical/holographic computing). It is NOT quantum hardware, NOT a
 cosmological simulation, and NOT a validation of the Coherent Sequence
 theory. All signals are synthetic.
 
-What it demonstrates
---------------------
-That C_seq -- the theory's order parameter for a macroscopic coherent
-state -- is computationally meaningful: encode data as phase patterns,
-compute by interference, and read the answer's fidelity back as C_seq.
-The same mathematics that describes a coherent state describes a working
-memory. That is the macro-micro bridge, made executable.
+What it shows
+-------------
+That the same function used as C_seq in the theory, |<exp(i*theta)>|, can
+be used as a recall-fidelity readout in a classical phase-based associative
+memory. This is a shared formula, not a physical link between the theory
+and this software. When the target is known, the readout equals
+|2 * bit_accuracy - 1| for BPSK patterns; it cannot score a recall when the
+target is unknown. Results are SYNTHETIC.
 """
 
 from .wave import WaveState, coherence
