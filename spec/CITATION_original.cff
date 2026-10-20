@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+title: "Coherent Sequence Wave Computer"
+message: "If you use this software, please cite it as below."
+type: software
+version: 0.1.0
+date-released: 2026-10-19
+authors:
+  - family-names: "Lee"
+    given-names: "Mun Seok"
+license: AGPL-3.0-only
+repository-code: "https://github.com/sparkainlp-x/"
+keywords:
+  - wave-computing
+  - holographic-memory
+  - phase-coherence
+  - digital-to-wave
+  - OES-32
+  - reproducible-research
+abstract: >-
+  Reference implementation of wave-state computing built from the
+  phase-coherence function C_seq of Coherent Sequence theory:
+  digital-to-wave BPSK encoding, holographic associative memory via
+  interference, fidelity readout as C_seq, OES-32 lock-in detection,
+  and SHA-256 evidence passports. Classical simulation; all signals
+  synthetic.
