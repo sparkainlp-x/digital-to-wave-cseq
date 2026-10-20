@@ -1,0 +1,58 @@
+{
+  "title": "Coherent Sequence Wave Computer",
+  "version": "0.1.0",
+  "upload_type": "software",
+  "description": "<p>Classical, SYNTHETIC Python reference implementation of phase-based associative memory. Random bit patterns are encoded as BPSK wave-states, stored in one complex Hopfield coupling matrix and recalled by phase dynamics. Recall fidelity is read out with the phase-coherence formula C_seq = |<exp(i theta)>| from Mun Seok Lee's Coherent Sequence theory, applied to the relative phase. Includes an OES-32 block score (reported as a convergence flag, since it also fires on never-stored cues, noise and an empty memory), seeded capacity and confabulation sweeps, and SHA-256 evidence passports. Not quantum hardware; not a validation of the Coherent Sequence theory; no physical claim.</p>",
+  "creators": [
+    {
+      "name": "Brisson, Jean-François",
+      "orcid": "0009-0000-9778-5374",
+      "affiliation": "Spark AI NLP, Fredericton, New Brunswick, Canada"
+    }
+  ],
+  "license": "AGPL-3.0-only",
+  "access_right": "open",
+  "language": "eng",
+  "keywords": [
+    "synthetic data",
+    "holographic memory",
+    "complex Hopfield network",
+    "phase coherence",
+    "C_seq",
+    "BPSK",
+    "associative memory",
+    "OES-32",
+    "reproducibility",
+    "Digital to Wave"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.21947036",
+      "relation": "references",
+      "scheme": "doi",
+      "resource_type": "publication-preprint"
+    },
+    {
+      "identifier": "10.5281/zenodo.21947108",
+      "relation": "references",
+      "scheme": "doi",
+      "resource_type": "publication-preprint"
+    },
+    {
+      "identifier": "https://github.com/sparkainlp-x/digital-to-wave-cseq",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ],
+  "references": [
+    "Lee, M. S. (2026). Coherent Sequence Unified Coupled-Field Theory [Preprint]. No DOI known to this project.",
+    "Lee, M. S. (2026). Digital to Wave: Paradigm Shift in Quantum Wave-Based Computing and Lab-Grown Diamond Memory [Preprint]. Zenodo. https://doi.org/10.5281/zenodo.21947036",
+    "Lee, M. S. (2026). Digital to Wave: LGD In Situ Wave Memory-Human Wave Integrated Interface-Metaverse Hologram- Wave Affective AI [Preprint, Part II]. Zenodo. https://doi.org/10.5281/zenodo.21947108"
+  ],
+  "notes": "Evidence status: all results are SYNTHETIC (seeded software runs). Acknowledgement: the C_seq phase-coherence formula and the wave-state framing come from Mun Seok Lee's Coherent Sequence theory and Digital to Wave preprints, credited here as a collaborator's source work. Mun Seok Lee has not reviewed or endorsed this software, and no endorsement is implied.",
+  "communities": [
+    {
+      "identifier": "spark-ai-nlp"
+    }
+  ]
+}

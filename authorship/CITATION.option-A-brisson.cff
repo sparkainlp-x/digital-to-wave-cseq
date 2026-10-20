@@ -1,0 +1,63 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata from this file."
+title: "Coherent Sequence Wave Computer"
+type: software
+authors:
+  - family-names: "Brisson"
+    given-names: "Jean-François"
+    orcid: "https://orcid.org/0009-0000-9778-5374"
+    affiliation: "Spark AI NLP, Fredericton, New Brunswick, Canada"
+version: 0.1.0
+license: AGPL-3.0-only
+repository-code: "https://github.com/sparkainlp-x/digital-to-wave-cseq"
+abstract: >-
+  Classical, SYNTHETIC Python reference implementation of phase-based associative memory. Random bit patterns are encoded as BPSK wave-states, stored in one complex Hopfield coupling matrix and recalled by phase dynamics. Recall fidelity is read out with the phase-coherence formula C_seq = |<exp(i theta)>| from Mun Seok Lee's Coherent Sequence theory, applied to the relative phase. Includes an OES-32 block score (reported as a convergence flag, since it also fires on never-stored cues, noise and an empty memory), seeded capacity and confabulation sweeps, and SHA-256 evidence passports. Not quantum hardware; not a validation of the Coherent Sequence theory; no physical claim.
+keywords:
+  - "synthetic-data"
+  - "holographic-memory"
+  - "complex-hopfield-network"
+  - "phase-coherence"
+  - "C_seq"
+  - "BPSK"
+  - "associative-memory"
+  - "OES-32"
+  - "reproducibility"
+  - "Digital to Wave"
+references:
+  - type: article
+    status: preprint
+    title: "Coherent Sequence Unified Coupled-Field Theory"
+    authors:
+      - family-names: "Lee"
+        given-names: "Mun Seok"
+        orcid: "https://orcid.org/0009-0003-6627-8507"
+    year: 2026
+    notes: "Source of the C_seq phase-coherence formula used as the recall-fidelity readout. No DOI known to this project."
+  - type: article
+    status: preprint
+    title: "Digital to Wave: Paradigm Shift in Quantum Wave-Based Computing and Lab-Grown Diamond Memory"
+    authors:
+      - family-names: "Lee"
+        given-names: "Mun Seok"
+        orcid: "https://orcid.org/0009-0003-6627-8507"
+    year: 2026
+    date-published: "2026-08-15"
+    publisher:
+      name: "Zenodo"
+    doi: "10.5281/zenodo.21947036"
+    url: "https://doi.org/10.5281/zenodo.21947036"
+    notes: "Part I. Source of the wave-state framing."
+  - type: article
+    status: preprint
+    title: "Digital to Wave: LGD In Situ Wave Memory-Human Wave Integrated Interface-Metaverse Hologram- Wave Affective AI"
+    authors:
+      - family-names: "Lee"
+        given-names: "Mun Seok"
+        orcid: "https://orcid.org/0009-0003-6627-8507"
+    year: 2026
+    date-published: "2026-08-15"
+    publisher:
+      name: "Zenodo"
+    doi: "10.5281/zenodo.21947108"
+    url: "https://doi.org/10.5281/zenodo.21947108"
+    notes: "Part II. Cited for context only; nothing in it is modelled here."
