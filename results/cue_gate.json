@@ -1,0 +1,147 @@
+{
+  "evidence_label": "SYNTHETIC",
+  "gate": [
+    {
+      "confabulation_suspected_rate": 0.0,
+      "flip_prob": 0.2,
+      "ghost_false_accept_rate": 0.0135,
+      "patterns": 4,
+      "tau_mean": 0.032,
+      "trials": 500,
+      "unverified_rate": 0.0,
+      "verified_rate": 1.0,
+      "withheld_rate": 0.0
+    },
+    {
+      "confabulation_suspected_rate": 0.0,
+      "flip_prob": 0.3,
+      "ghost_false_accept_rate": null,
+      "patterns": 4,
+      "tau_mean": 0.032,
+      "trials": 500,
+      "unverified_rate": 0.0,
+      "verified_rate": 1.0,
+      "withheld_rate": 0.0
+    },
+    {
+      "confabulation_suspected_rate": 0.048,
+      "flip_prob": 0.35,
+      "ghost_false_accept_rate": null,
+      "patterns": 4,
+      "tau_mean": 0.032,
+      "trials": 500,
+      "unverified_rate": 0.004,
+      "verified_rate": 0.948,
+      "withheld_rate": 0.0
+    },
+    {
+      "confabulation_suspected_rate": 0.432,
+      "flip_prob": 0.4,
+      "ghost_false_accept_rate": null,
+      "patterns": 4,
+      "tau_mean": 0.032,
+      "trials": 500,
+      "unverified_rate": 0.004,
+      "verified_rate": 0.564,
+      "withheld_rate": 0.0
+    },
+    {
+      "confabulation_suspected_rate": 0.904,
+      "flip_prob": 0.45,
+      "ghost_false_accept_rate": null,
+      "patterns": 4,
+      "tau_mean": 0.032,
+      "trials": 500,
+      "unverified_rate": 0.002,
+      "verified_rate": 0.094,
+      "withheld_rate": 0.0
+    },
+    {
+      "confabulation_suspected_rate": 0.0,
+      "flip_prob": 0.2,
+      "ghost_false_accept_rate": 0.0125,
+      "patterns": 20,
+      "tau_mean": 0.0424,
+      "trials": 500,
+      "unverified_rate": 0.98,
+      "verified_rate": 0.02,
+      "withheld_rate": 0.0
+    },
+    {
+      "confabulation_suspected_rate": 0.0,
+      "flip_prob": 0.3,
+      "ghost_false_accept_rate": null,
+      "patterns": 20,
+      "tau_mean": 0.0424,
+      "trials": 500,
+      "unverified_rate": 0.99,
+      "verified_rate": 0.01,
+      "withheld_rate": 0.0
+    },
+    {
+      "confabulation_suspected_rate": 0.094,
+      "flip_prob": 0.35,
+      "ghost_false_accept_rate": null,
+      "patterns": 20,
+      "tau_mean": 0.0424,
+      "trials": 500,
+      "unverified_rate": 0.902,
+      "verified_rate": 0.004,
+      "withheld_rate": 0.0
+    },
+    {
+      "confabulation_suspected_rate": 0.586,
+      "flip_prob": 0.4,
+      "ghost_false_accept_rate": null,
+      "patterns": 20,
+      "tau_mean": 0.0424,
+      "trials": 500,
+      "unverified_rate": 0.412,
+      "verified_rate": 0.002,
+      "withheld_rate": 0.0
+    },
+    {
+      "confabulation_suspected_rate": 0.946,
+      "flip_prob": 0.45,
+      "ghost_false_accept_rate": null,
+      "patterns": 20,
+      "tau_mean": 0.0424,
+      "trials": 500,
+      "unverified_rate": 0.054,
+      "verified_rate": 0.0,
+      "withheld_rate": 0.0
+    }
+  ],
+  "jitter": 0.3,
+  "mixture_cue": {
+    "cue": "first half of pattern 0 + second half of pattern 1",
+    "cue_gate": true,
+    "cue_overlaps": [
+      0.2991,
+      0.274,
+      0.001,
+      0.0002
+    ],
+    "recalled_overlaps": [
+      0.2659,
+      0.3077,
+      0.2197,
+      0.0002
+    ],
+    "tau": 0.0307,
+    "verdict": "UNVERIFIED_RECALL"
+  },
+  "n_modes": 256,
+  "recall_steps": 40,
+  "separation": {
+    "ghost_cue_max_overlap_max": 0.0342,
+    "ghost_cue_max_overlap_mean": 0.0087,
+    "ghost_cue_max_overlap_q99": 0.0294,
+    "ghost_post_recall_margin_max": 0.9727,
+    "stored_cue_max_overlap_mean": 0.3238,
+    "stored_cue_max_overlap_min": 0.1699,
+    "stored_post_recall_margin_min": 0.3953,
+    "trials": 240
+  },
+  "sha256": "da895d888c3b35398ffe91841e364d2ed85c25093f41e307cbde4a0e334693e1"
+}
