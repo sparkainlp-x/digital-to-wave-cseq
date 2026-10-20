@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.0 (unreleased)
+
+Verification layer, adapted from a v0.2.0 handoff package and corrected.
+
+- `calibrate.py`: cue-overlap threshold tau = q0.99 of never-stored cues on the hologram in use.
+- `verify.py`: separate-path re-computation of reported metrics. A mismatch withholds the verdict. Fixed: target bits are now read from wrapped phases.
+- `claims.py`: regular-expression screen for report text, with evidence tags and a boundary statement. Fixed: negation now only counts inside its own clause ("not slow: a quantum computer" was passing), and the org's banned terms were added.
+- `verdict.py`: fail-closed verdicts VERIFIED_RECALL / UNVERIFIED_RECALL / CONFABULATION_SUSPECTED / WITHHELD. Fixed: a bit-accuracy gate was added, because the handoff version returned VERIFIED_RECALL for a fully inverted recall (bit accuracy 0.0). New: a target-free mode, so the gate can be used when the true answer is unknown.
+- `demo_verified.py`: verified demo for seeds 7 and 42. The never-stored control is assessed without a target. (The handoff demo used the recalled spectrum's winner as the "target", which is circular.)
+- `experiments/cue_gate_sweep.py` and `results/cue_gate.md`: SYNTHETIC separation, decoherence and capacity results, plus a mixture-cue blind spot.
+- Tests: 30 -> 52. All v0.1.0 fixes kept.
+
 ## 0.1.0 (unreleased)
 
 - Initial code exactly as given in the agent-instructions spec (first commit, kept in `spec/`).

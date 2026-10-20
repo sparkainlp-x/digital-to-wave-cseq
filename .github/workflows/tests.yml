@@ -30,7 +30,10 @@ jobs:
         run: |
           python demo.py --seed 7
           python demo.py --seed 42
+          python demo_verified.py --seed 7
+          python demo_verified.py --seed 42
       - name: Sweep results reproduce byte for byte
         run: |
           python experiments/capacity_sweep.py > /dev/null
+          python experiments/cue_gate_sweep.py > /dev/null
           git diff --exit-code results/
