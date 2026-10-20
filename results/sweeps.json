@@ -1,0 +1,129 @@
+{
+  "capacity": [
+    {
+      "bit_accuracy_mean": 1.0,
+      "exact_recall_rate": 1.0,
+      "fidelity_sliced_mean": 1.0,
+      "fidelity_unsliced_mean": 1.0,
+      "load": 0.0039,
+      "patterns": 1
+    },
+    {
+      "bit_accuracy_mean": 1.0,
+      "exact_recall_rate": 1.0,
+      "fidelity_sliced_mean": 1.0,
+      "fidelity_unsliced_mean": 1.0,
+      "load": 0.0195,
+      "patterns": 5
+    },
+    {
+      "bit_accuracy_mean": 0.9998,
+      "exact_recall_rate": 0.99,
+      "fidelity_sliced_mean": 0.9997,
+      "fidelity_unsliced_mean": 0.9933,
+      "load": 0.0391,
+      "patterns": 10
+    },
+    {
+      "bit_accuracy_mean": 1.0,
+      "exact_recall_rate": 1.0,
+      "fidelity_sliced_mean": 1.0,
+      "fidelity_unsliced_mean": 1.0,
+      "load": 0.0586,
+      "patterns": 15
+    },
+    {
+      "bit_accuracy_mean": 0.9816,
+      "exact_recall_rate": 0.77,
+      "fidelity_sliced_mean": 0.9632,
+      "fidelity_unsliced_mean": 0.914,
+      "load": 0.0781,
+      "patterns": 20
+    },
+    {
+      "bit_accuracy_mean": 0.9922,
+      "exact_recall_rate": 0.83,
+      "fidelity_sliced_mean": 0.9844,
+      "fidelity_unsliced_mean": 0.9805,
+      "load": 0.0977,
+      "patterns": 25
+    },
+    {
+      "bit_accuracy_mean": 0.8793,
+      "exact_recall_rate": 0.29,
+      "fidelity_sliced_mean": 0.7585,
+      "fidelity_unsliced_mean": 0.6974,
+      "load": 0.1172,
+      "patterns": 30
+    },
+    {
+      "bit_accuracy_mean": 0.9266,
+      "exact_recall_rate": 0.31,
+      "fidelity_sliced_mean": 0.8533,
+      "fidelity_unsliced_mean": 0.8123,
+      "load": 0.1367,
+      "patterns": 35
+    },
+    {
+      "bit_accuracy_mean": 0.7867,
+      "exact_recall_rate": 0.06,
+      "fidelity_sliced_mean": 0.5734,
+      "fidelity_unsliced_mean": 0.5041,
+      "load": 0.1562,
+      "patterns": 40
+    },
+    {
+      "bit_accuracy_mean": 0.7065,
+      "exact_recall_rate": 0.0,
+      "fidelity_sliced_mean": 0.413,
+      "fidelity_unsliced_mean": 0.3552,
+      "load": 0.1953,
+      "patterns": 50
+    },
+    {
+      "bit_accuracy_mean": 0.657,
+      "exact_recall_rate": 0.0,
+      "fidelity_sliced_mean": 0.3141,
+      "fidelity_unsliced_mean": 0.2645,
+      "load": 0.2344,
+      "patterns": 60
+    }
+  ],
+  "confabulation": {
+    "unstored_fidelity_vs_own_bits_mean": 0.098,
+    "unstored_max_overlap_mean": 0.7948,
+    "unstored_rate_max_overlap_over_0.9": 0.63
+  },
+  "control_trials": 200,
+  "evidence_label": "SYNTHETIC",
+  "flip_prob": 0.2,
+  "n_modes": 256,
+  "oes32_controls": [
+    {
+      "cue": "stored",
+      "fire_rate": 1.0,
+      "oes32_mean": 0.9924,
+      "oes32_min": 0.9904
+    },
+    {
+      "cue": "unstored",
+      "fire_rate": 1.0,
+      "oes32_mean": 0.9814,
+      "oes32_min": 0.9722
+    },
+    {
+      "cue": "noise",
+      "fire_rate": 1.0,
+      "oes32_mean": 0.9835,
+      "oes32_min": 0.98
+    },
+    {
+      "cue": "empty",
+      "fire_rate": 1.0,
+      "oes32_mean": 0.9854,
+      "oes32_min": 0.985
+    }
+  ],
+  "sha256": "28d07d86a609c1d0dea047c934d39cedf471ca662a164d014b488f0a6b2b9469",
+  "trials_per_cell": 100
+}
