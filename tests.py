@@ -1,15 +1,9 @@
 """Test suite for cseq_wave. Run:  python tests.py"""
 
-import numpy as np
-
-from cseq_wave import (
-    HolographicMemory,
-    WaveState,
-    bits_to_bits_helper if False else None,
-) if False else None
-
 import sys
 sys.path.insert(0, ".")
+
+import numpy as np
 
 from cseq_wave import (
     HolographicMemory,
