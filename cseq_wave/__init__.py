@@ -34,6 +34,10 @@ from .encode import bits_to_wave, wave_to_bits, text_to_bits, bits_to_text
 from .memory import HolographicMemory
 from .oes import oes32_score, detect_events
 from .evidence import evidence_passport
+from .calibrate import calibrate_cue_threshold
+from .verify import recompute_all, verify_claims
+from .claims import BOUNDARY_STATEMENT, screen_text, tag
+from .verdict import assess_recall
 
 __all__ = [
     "WaveState",
@@ -46,6 +50,13 @@ __all__ = [
     "oes32_score",
     "detect_events",
     "evidence_passport",
+    "calibrate_cue_threshold",
+    "recompute_all",
+    "verify_claims",
+    "screen_text",
+    "tag",
+    "BOUNDARY_STATEMENT",
+    "assess_recall",
 ]
 
 __version__ = "0.1.0"
