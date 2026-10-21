@@ -15,7 +15,7 @@ digital bits --encode--> wave-states psi = A * exp(i*theta)   (BPSK)
 
 ## v0.2.0: recall verdicts (SYNTHETIC)
 
-`assess_recall` returns a fail-closed verdict. VERIFIED_RECALL needs three things: the raw cue's matched-filter overlap must clear a threshold calibrated on never-stored cues, the recall must reach fidelity and bit accuracy of at least 0.99, and a separate re-computation must agree with the reported numbers. It also works without the true answer, by checking the recall against the stored pattern the cue pointed at.
+`assess_recall` returns a fail-closed verdict. VERIFIED_RECALL needs three things: the raw cue's matched-filter overlap must clear a threshold calibrated on never-stored cues, the recall must reach fidelity and bit accuracy of at least 0.99, and a separate re-computation must agree with the reported numbers. It also works without the true answer, by checking the recall against the stored pattern the cue pointed at. Since the verification-contract fix, every gate must pass on both the reported and the independently recomputed numbers, and the calibration must be a `cseq-cal/1` record bound to the exact stored patterns (`memory_digest`); legacy `{"tau_cue_overlap": x}` dicts give WITHHELD. See CHANGELOG for compatibility changes.
 
 On 240 trials (4 patterns, 20% flips, 0.3 rad jitter), the cue overlap averaged 0.324 for stored cues (minimum 0.170) and 0.0087 for never-stored cues (q0.99 0.029). After recall, the winner margins overlap (stored down to 0.395, never-stored up to 0.973), so the OES-32 flag and the post-recall spectrum cannot do this job. With tau at the null q0.99, about 1.3% of never-stored cues still pass.
 
@@ -73,7 +73,7 @@ Exact recall holds up to about 15 patterns (load 0.06) and breaks down past abou
 
 1. **The OES-32 flag does not detect correct recall** (v0.2.0 adds the calibrated cue gate for that). On the recall trajectory it fired in 200 of 200 runs for stored cues, never-stored cues, uniform-noise cues *and an empty memory* (mean scores 0.98 to 0.99). For a signal in [0, 1] the score is at least the signal's mean, and the trajectory approaches 1 whenever the dynamics settle. It is kept as a convergence flag.
 2. **Confabulation.** A cue for a pattern that was never stored gets a confident wrong answer. In 200 runs, 63% converged onto a stored pattern (overlap > 0.9), with mean fidelity 0.10 against the cue's own bits. Nothing available *without* the true target exposes this, so the fidelity readout cannot catch it in a real query. v0.2.0 flags most such cues with the calibrated cue gate (above).
-3. **Fidelity is sign-blind.** For BPSK the sliced readout equals |2 x bit accuracy - 1|, so a fully inverted pattern also scores 1.0. Slicing can only raise the score. Always report bit accuracy too.
+3. **Fidelity is sign-blind.** For BPSK the sliced readout equals |2 x bit accuracy - 1|, so a fully inverted pattern also scores 1.0. Slicing may raise or lower the score (recalled [1.5, 1.7] vs target [0, 0]: unsliced about 0.995, sliced 0.0). Sliced fidelity, unsliced fidelity and bit accuracy are three distinct numbers. Always report bit accuracy too.
 4. Uniform random codebooks only. Correlated codewords (for example raw text) create spurious attractors.
 5. Results depend on the seed. Passport digests cover protocol, seed, parameters and metrics, not the timestamp.
 

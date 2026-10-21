@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased (fix/verification-contract)
+
+All results remain SYNTHETIC (classical simulation only).
+
+- `verify_claims` is fail-closed: empty dicts, missing required metrics (either side), unknown reported metrics, bool/str/NaN/inf values, out-of-range values, invalid winner indices and invalid tolerances all fail with an explicit `reason`. Return shape `(ok, checks)` is unchanged; new optional `n_patterns` argument bounds the winner index.
+- New `cseq_wave/validation.py` (phase and binary vector validation, no broadcasting, binary values checked before the integer cast), wired into `encode.py`, `memory.py`, `verify.py` and `verdict.py`.
+- `assess_recall` gates on BOTH the reported and the recomputed cue overlap, fidelity and bit accuracy; agreement within tolerance never rescues a value below its threshold. `target_index` must be an in-range integer (no truncation).
+- Calibration is bound to the hologram (`schema_version` `cseq-cal/1`, `memory_digest`, mode/pattern counts, null protocol, noise, sample count, quantile, seed, threshold). New `HolographicMemory.digest()` and `calibrate.validate_calibration`.
+- Corrected the docs: slicing may raise or lower fidelity.
+
+### Compatibility changes
+- Legacy calibration dicts such as `{"tau_cue_overlap": 0.03}` now give `WITHHELD`; re-run `calibrate_cue_threshold` on the finalized memory. Calibrations go stale when patterns are added.
+- `bits_to_wave` / `bits_to_text` reject multidimensional input (previously flattened silently) and fractional values (previously truncated by the int cast). Empty bit vectors are still accepted by the text codec.
+- Phase inputs with NaN/inf, complex, boolean or wrongly shaped values raise `ValueError`/`TypeError` in the memory and verifier, and give `WITHHELD` in `assess_recall`.
+
 ## 0.2.0 (unreleased)
 
 Verification layer, adapted from a v0.2.0 handoff package and corrected.
@@ -17,7 +32,7 @@ Verification layer, adapted from a v0.2.0 handoff package and corrected.
 - Initial code exactly as given in the agent-instructions spec (first commit, kept in `spec/`).
 - Removed the bogus guarded import block from `tests.py`.
 - Corrected the `recall()` docstring: the trajectory is step-to-step self-consistency, a convergence measure.
-- Documented that the fidelity readout is sign-blind (equals |2 x bit accuracy - 1| for BPSK) and that slicing can only raise it.
+- Documented that the fidelity readout is sign-blind (equals |2 x bit accuracy - 1| for BPSK) and how slicing affects it (corrected in Unreleased: slicing may raise or lower it).
 - Documented that `overlaps()` on a decohered cue gives about (1 - 2p)^2. The demo now also prints the recalled-state overlaps.
 - Relabelled the OES-32 trajectory result as a convergence flag. The demo adds never-stored and uniform-noise controls.
 - Evidence passports convert numpy types, reject NaN, and carry an `evidence_label: SYNTHETIC`.

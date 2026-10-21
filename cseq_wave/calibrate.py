@@ -18,11 +18,46 @@ distribution, estimated from seeded null trials against the hologram in
 use (the same idea as the self-calibrated threshold in oes512q-latch).
 By construction about 1% of ghost cues pass (1.3% measured). Calibration
 values are SYNTHETIC: they describe this simulator's null behaviour only.
+
+Calibration schema (v0.3.0, ``schema_version == "cseq-cal/1"``)
+--------------------------------------------------------------
+A calibration is bound to the exact hologram it was measured on:
+
+    schema_version    "cseq-cal/1"
+    memory_digest     HolographicMemory.digest() (patterns, shape, order)
+    mode_count        mem.n_modes
+    pattern_count     mem.n_patterns
+    null_protocol     NULL_PROTOCOL (how ghost cues are generated)
+    noise             {"flip_prob": float, "jitter": float}
+    null_n            number of null samples (sample count)
+    null_quantile     quantile used for tau, in (0, 1)
+    seed              integer RNG seed
+    tau_cue_overlap   the threshold, finite, in [0, 1]
+
+``validate_calibration(cal, mem)`` rejects any calibration that is not a
+dict, lacks a field, has the wrong schema version, or whose digest /
+mode count / pattern count do not match the hologram (stale: patterns
+were added or changed after calibration; mismatched: another hologram).
+
+Compatibility: legacy dicts such as ``{"tau_cue_overlap": 0.03}`` are
+NOT accepted as verified calibration; assess_recall returns WITHHELD.
+Re-run calibrate_cue_threshold on the finalized memory instead.
 """
 
 import numpy as np
 
 from .encode import bits_to_wave
+from .validation import is_real_number
+
+SCHEMA_VERSION = "cseq-cal/1"
+NULL_PROTOCOL = (
+    "ghost bits ~ rng.integers(0, 2, n_modes); cue = bits_to_wave(ghost)"
+    ".decohere(rng, flip_prob, jitter); score = max(mem.overlaps(cue.phase))"
+)
+REQUIRED_FIELDS = (
+    "schema_version", "memory_digest", "mode_count", "pattern_count",
+    "null_protocol", "noise", "null_n", "null_quantile", "seed", "tau_cue_overlap",
+)
 
 
 def calibrate_cue_threshold(
@@ -50,6 +85,12 @@ def calibrate_cue_threshold(
     null_overlaps = np.asarray(null_overlaps)
     tau = float(max(np.quantile(null_overlaps, quantile), floor))
     return {
+        "schema_version": SCHEMA_VERSION,
+        "memory_digest": mem.digest(),
+        "mode_count": int(mem.n_modes),
+        "pattern_count": int(mem.n_patterns),
+        "null_protocol": NULL_PROTOCOL,
+        "noise": {"flip_prob": float(flip_prob), "jitter": float(jitter)},
         "tau_cue_overlap": tau,
         "null_n": int(n_null),
         "null_quantile": float(quantile),
@@ -66,3 +107,44 @@ def calibrate_cue_threshold(
             % (quantile, n_null)
         ),
     }
+
+
+def _int_field(cal, key):
+    v = cal[key]
+    if isinstance(v, bool) or not isinstance(v, (int, np.integer)):
+        raise ValueError(f"calibration.{key} must be an integer")
+    return int(v)
+
+
+def validate_calibration(cal, mem):
+    """Raise ValueError unless `cal` is a current cseq-cal/1 calibration of `mem`."""
+    if not isinstance(cal, dict):
+        raise ValueError("calibration must be a dict")
+    missing = [k for k in REQUIRED_FIELDS if k not in cal]
+    if missing:
+        raise ValueError("legacy or incomplete calibration; missing " + ", ".join(missing))
+    if cal["schema_version"] != SCHEMA_VERSION:
+        raise ValueError(f"unsupported calibration schema {cal['schema_version']!r}")
+    if cal["null_protocol"] != NULL_PROTOCOL:
+        raise ValueError("calibration null-generation protocol differs")
+    if _int_field(cal, "mode_count") != mem.n_modes:
+        raise ValueError("calibration mode_count does not match memory")
+    if _int_field(cal, "pattern_count") != mem.n_patterns:
+        raise ValueError("calibration pattern_count does not match memory (stale?)")
+    if cal["memory_digest"] != mem.digest():
+        raise ValueError("calibration memory_digest does not match memory (stale or mismatched)")
+    if _int_field(cal, "null_n") < 1:
+        raise ValueError("calibration null_n must be >= 1")
+    _int_field(cal, "seed")
+    q = cal["null_quantile"]
+    if not is_real_number(q) or not 0.0 < float(q) < 1.0:
+        raise ValueError("calibration null_quantile must be in (0, 1)")
+    noise = cal["noise"]
+    if not isinstance(noise, dict) or set(noise) != {"flip_prob", "jitter"}:
+        raise ValueError("calibration noise must be {flip_prob, jitter}")
+    if not all(is_real_number(v) and float(v) >= 0 for v in noise.values()):
+        raise ValueError("calibration noise values must be finite and nonnegative")
+    tau = cal["tau_cue_overlap"]
+    if not is_real_number(tau) or not 0.0 <= float(tau) <= 1.0:
+        raise ValueError("calibration tau_cue_overlap must be finite in [0, 1]")
+    return float(tau)

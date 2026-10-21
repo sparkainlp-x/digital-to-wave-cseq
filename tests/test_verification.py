@@ -69,7 +69,7 @@ def test_seed7_matches_handoff_numbers():
 def test_inverted_recall_is_not_verified():
     """v0.2.0 handoff bug: fidelity is sign-blind, so an inverted recall passed."""
     rng, cb, mem = build()
-    cal = {"tau_cue_overlap": 0.03}
+    cal = calibrate_cue_threshold(mem, seed=1)
     cue = bits_to_wave(cb[0]).decohere(rng, flip_prob=0.2)
     inverted = cb[0] * np.pi + np.pi
     v = assess_recall(mem, cue, inverted, cal, target_phase=cb[0] * np.pi, target_index=0)
@@ -82,7 +82,7 @@ def test_wrong_target_index_is_suspected_confabulation():
     rng, cb, mem = build()
     cue = bits_to_wave(cb[0]).decohere(rng, flip_prob=0.2)
     rec, _ = mem.recall(cue)
-    v = assess_recall(mem, cue, rec, {"tau_cue_overlap": 0.03}, target_phase=cb[1] * np.pi, target_index=1)
+    v = assess_recall(mem, cue, rec, calibrate_cue_threshold(mem, seed=1), target_phase=cb[1] * np.pi, target_index=1)
     assert v["verdict"] == "CONFABULATION_SUSPECTED"
 
 
@@ -101,7 +101,7 @@ def test_fail_closed_on_missing_calibration_and_errors():
     rng, cb, mem = build()
     cue = bits_to_wave(cb[0])
     assert assess_recall(mem, cue, cb[0] * np.pi, None)["verdict"] == "WITHHELD"
-    v = assess_recall(mem, cue, np.zeros(3), {"tau_cue_overlap": 0.03})
+    v = assess_recall(mem, cue, np.zeros(3), calibrate_cue_threshold(mem, seed=1))
     assert v["verdict"] == "WITHHELD" and "error" in v
 
 
