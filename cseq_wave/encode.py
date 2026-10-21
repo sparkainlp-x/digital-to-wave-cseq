@@ -17,16 +17,18 @@ def bits_to_wave(bits):
     """Encode a bit array as a WaveState (BPSK: 0->0, 1->pi)."""
     from .wave import WaveState
 
-    bits = np.asarray(bits, dtype=int).ravel()
-    if not np.all(np.isin(bits, [0, 1])):
-        raise ValueError("bits must be 0/1")
+    from .validation import validate_bits
+
+    bits = validate_bits(bits)
     phase = bits.astype(float) * np.pi
     return WaveState(np.ones_like(phase), phase)
 
 
 def wave_to_bits(wavestate):
     """Decode a WaveState back to bits (hard decision on phase)."""
-    phase = np.angle(np.exp(1j * wavestate.phase))  # wrap to [-pi, pi]
+    from .validation import validate_phase
+
+    phase = np.angle(np.exp(1j * validate_phase(wavestate.phase, name="wave phase")))  # wrap to [-pi, pi]
     return (np.abs(phase) > np.pi / 2).astype(int)
 
 
@@ -36,9 +38,13 @@ def slice_bpsk(phase):
     Real coherent receivers slice the received wave to the nearest
     constellation point before readout. Without this step the
     continuous-phase dynamics can rest slightly off-constellation and
-    the raw-phase fidelity understates what the receiver actually sees.
+    the raw-phase fidelity can differ from what the receiver sees. Slicing
+    can RAISE or LOWER fidelity (e.g. recalled [1.5, 1.7] vs target [0, 0]:
+    unsliced ~0.995, sliced 0.0), so report which one you use.
     """
-    phase = np.asarray(phase, dtype=float)
+    from .validation import validate_phase
+
+    phase = validate_phase(phase)
     wrapped = np.angle(np.exp(1j * phase))
     return np.where(np.abs(wrapped) > np.pi / 2, np.pi, 0.0)
 
@@ -52,7 +58,9 @@ def text_to_bits(text):
 
 def bits_to_text(bits):
     """Bit array -> UTF-8 text (truncates to whole bytes)."""
-    bits = np.asarray(bits, dtype=int).ravel()
+    from .validation import validate_bits
+
+    bits = validate_bits(bits)
     n = (len(bits) // 8) * 8
     if n == 0:
         return ""

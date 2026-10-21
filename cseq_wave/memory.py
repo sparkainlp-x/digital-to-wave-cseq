@@ -19,23 +19,33 @@ Readout: the recall fidelity is reported AS the coherence C_seq of the
 relative phase between recalled and target patterns (see wave.alignment).
 """
 
+import hashlib
+
 import numpy as np
 
+from .validation import validate_index, validate_phase
 from .wave import alignment
+
+DIGEST_SCHEME = "cseq-patterns-sha256/1"
 
 
 class HolographicMemory:
     def __init__(self, n_modes):
-        self.n_modes = n_modes
+        self.n_modes = validate_index(n_modes, name="n_modes")
+        if self.n_modes < 1:
+            raise ValueError("n_modes must be >= 1")
         self.weights = np.zeros((n_modes, n_modes), dtype=complex)
         self.n_patterns = 0
         self._patterns = []
 
     def store(self, wavestate):
         """Interfere one wave-state into the hologram."""
-        x = wavestate.field
-        if x.shape[0] != self.n_modes:
+        if np.asarray(wavestate.phase).shape != (self.n_modes,):
             raise ValueError("pattern mode count mismatch")
+        validate_phase(wavestate.phase, self.n_modes, name="stored pattern phase")
+        x = wavestate.field
+        if not np.all(np.isfinite(x)):
+            raise ValueError("stored pattern field contains NaN or infinity")
         # unit-magnitude phases carry the information
         p = np.exp(1j * np.angle(x))
         self.weights += np.outer(p, p.conj())
@@ -56,7 +66,7 @@ class HolographicMemory:
         of an empty memory). It does not say whether the recalled pattern is
         the right one. When track_coherence is False the trajectory is empty.
         """
-        s = np.exp(1j * np.asarray(cue.phase, dtype=float))
+        s = np.exp(1j * validate_phase(cue.phase, self.n_modes, name="cue phase"))
         traj = []
         prev = s.copy()
         for _ in range(steps):
@@ -75,7 +85,7 @@ class HolographicMemory:
         (0.36 at p = 0.2) for its source pattern, so pass the *recalled*
         phases to see the post-recall separation.
         """
-        q = np.exp(1j * np.asarray(cue_phase, dtype=float))
+        q = np.exp(1j * validate_phase(cue_phase, self.n_modes, name="cue phase"))
         scores = []
         for p in self._patterns:
             x = np.exp(1j * p)
@@ -91,11 +101,31 @@ class HolographicMemory:
 
         Caveats: for BPSK targets the sliced readout equals
         |2 * bit_accuracy - 1|, so it is blind to a global phase flip (a fully
-        inverted pattern also scores 1.0). Slicing can only raise the score
-        relative to slice_output=False. Report bit accuracy alongside it.
+        inverted pattern also scores 1.0). Slicing may RAISE OR LOWER the
+        score relative to slice_output=False (recalled [1.5, 1.7] vs target
+        [0, 0]: unsliced ~0.995, sliced 0.0). Sliced fidelity, unsliced
+        fidelity and bit accuracy are three distinct numbers; report bit
+        accuracy alongside whichever fidelity you use.
         """
         from .encode import slice_bpsk
+
+        recalled_phase = validate_phase(recalled_phase, self.n_modes, name="recalled phase")
+        target_phase = validate_phase(target_phase, self.n_modes, name="target phase")
 
         if slice_output:
             recalled_phase = slice_bpsk(recalled_phase)
         return alignment(recalled_phase, target_phase)
+
+    def digest(self):
+        """Canonical SHA-256 of the stored patterns (shape AND order).
+
+        Canonical form: ASCII header "cseq-patterns-sha256/1;n_modes=N;
+        n_patterns=P;" followed by every stored phase vector, in storage
+        order, as little-endian float64 bytes of shape (P, N). Storing the
+        same patterns in another order, or adding one, changes the digest.
+        """
+        h = hashlib.sha256()
+        h.update(f"{DIGEST_SCHEME};n_modes={self.n_modes};n_patterns={self.n_patterns};".encode("ascii"))
+        for p in self._patterns:
+            h.update(np.ascontiguousarray(p, dtype="<f8").tobytes())
+        return h.hexdigest()

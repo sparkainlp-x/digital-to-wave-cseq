@@ -1,4 +1,4 @@
-"""Fail-closed recall verdicts (v0.2.0, SYNTHETIC).
+"""Fail-closed recall verdicts (v0.3.0, SYNTHETIC).
 
 A recall is called VERIFIED_RECALL only when every gate passes. Any
 failure, missing input or exception gives a non-verified verdict.
@@ -7,9 +7,14 @@ failure, missing input or exception gives a non-verified verdict.
    calibrated from never-stored cues on this hologram (calibrate.py).
    This needs no ground truth. A ghost cue fails here however confidently
    the dynamics settle. If a target index is given, the cue's winner must
-   also be that index.
+   also be that index. Both the reported AND the independently
+   recomputed cue overlap must reach tau. The calibration must be a
+   cseq-cal/1 record bound to this exact hologram (calibrate.py);
+   legacy {"tau_cue_overlap": x} dicts give WITHHELD.
 2. RECALL GATE: the sliced fidelity must reach 0.99 (TARGET) *and* the
-   bit accuracy must reach 0.99 (TARGET). Fidelity alone is sign-blind:
+   bit accuracy must reach 0.99 (TARGET), each on BOTH the reported and
+   the recomputed path. Agreement within tolerance never rescues a value
+   below its threshold (reported 0.992 vs recomputed 0.988 fails). Fidelity alone is sign-blind:
    a fully inverted recall has fidelity 1.0 and bit accuracy 0.0.
    Reference pattern: the given target if known (ground-truth mode);
    otherwise the stored pattern that won the cue gate (self-consistency
@@ -31,7 +36,9 @@ not a gate: it fired on most never-stored cues in v0.1.0's sweeps.
 
 import numpy as np
 
+from .calibrate import validate_calibration
 from .claims import BOUNDARY_STATEMENT, tag
+from .validation import validate_index, validate_phase
 from .oes import detect_events
 from .verify import recompute_all, verify_claims
 
@@ -59,17 +66,26 @@ def assess_recall(mem, cue, recalled_phase, calibration, target_phase=None, targ
     verdict uses the self-consistency reference described above.
     """
     try:
-        if calibration is None or "tau_cue_overlap" not in calibration:
+        if calibration is None:
             return _withheld("missing calibration")
-        recalled_phase = np.asarray(recalled_phase, dtype=float)
-        cue_ov = mem.overlaps(cue.phase)
+        tau = validate_calibration(calibration, mem)
+        if mem.n_patterns < 1:
+            return _withheld("memory holds no patterns")
+        n = mem.n_modes
+        cue_phase = validate_phase(cue.phase, n, name="cue phase")
+        recalled_phase = validate_phase(recalled_phase, n, name="recalled phase")
+        if target_index is not None:
+            target_index = validate_index(target_index, mem.n_patterns, name="target_index")
+        cue_ov = mem.overlaps(cue_phase)
         winner = int(np.argmax(cue_ov))
         if target_phase is None:
+            # self-consistency: reference is the pattern the cue pointed at;
+            # this does NOT establish the recall is the "right" answer.
             mode = "self_consistency"
-            reference = np.asarray(mem._patterns[winner], dtype=float)
+            reference = validate_phase(mem._patterns[winner], n, name="reference phase")
         else:
             mode = "ground_truth"
-            reference = np.asarray(target_phase, dtype=float)
+            reference = validate_phase(target_phase, n, name="target phase")
 
         rec_bits = (np.abs(np.angle(np.exp(1j * recalled_phase))) > np.pi / 2).astype(int)
         ref_bits = (np.abs(np.angle(np.exp(1j * reference))) > np.pi / 2).astype(int)
@@ -79,16 +95,23 @@ def assess_recall(mem, cue, recalled_phase, calibration, target_phase=None, targ
             "fidelity_cseq": float(mem.fidelity(recalled_phase, reference)),
             "bit_accuracy": float(np.mean(rec_bits == ref_bits)),
         }
-        recomputed = recompute_all(mem._patterns, cue.phase, recalled_phase, reference)
-        verified, checks = verify_claims(reported, recomputed)
+        recomputed = recompute_all(mem._patterns, cue_phase, recalled_phase, reference)
+        verified, checks = verify_claims(reported, recomputed, n_patterns=mem.n_patterns)
+        return _decide(reported, recomputed, verified, checks, tau, target_index, mode, mem, recalled_phase)
+    except Exception as exc:  # fail-closed
+        return _withheld(f"{type(exc).__name__}: {exc}")
 
-        tau = float(calibration["tau_cue_overlap"])
-        cue_ok = reported["cue_overlap_max"] >= tau
+
+def _decide(reported, recomputed, verified, checks, tau, target_index, mode, mem, recalled_phase):
+    """Apply the gates on BOTH metric paths. Separated so it can be tested."""
+    try:
+        winner = reported["cue_overlap_winner"]
+        cue_ok = reported["cue_overlap_max"] >= tau and recomputed["cue_overlap_max"] >= tau
         if target_index is not None:
-            cue_ok = cue_ok and winner == int(target_index)
-        recall_ok = (
-            reported["fidelity_cseq"] >= FIDELITY_TARGET
-            and reported["bit_accuracy"] >= BIT_ACCURACY_TARGET
+            cue_ok = cue_ok and winner == target_index and recomputed["cue_overlap_winner"] == target_index
+        recall_ok = all(
+            d["fidelity_cseq"] >= FIDELITY_TARGET and d["bit_accuracy"] >= BIT_ACCURACY_TARGET
+            for d in (reported, recomputed)
         )
 
         if not verified:
