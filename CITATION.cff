@@ -10,6 +10,13 @@ authors:
 version: 0.3.0
 date-released: "2026-10-21"
 doi: "10.5281/zenodo.23529123"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.23529123"
+    description: "Version DOI for v0.3.0"
+  - type: doi
+    value: "10.5281/zenodo.23529122"
+    description: "Concept DOI (all versions)"
 license: AGPL-3.0-only
 repository-code: "https://github.com/sparkainlp-x/digital-to-wave-cseq"
 abstract: >-

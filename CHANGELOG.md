@@ -2,6 +2,8 @@
 
 ## 0.3.0 (2026-10-21)
 
+- Archived on Zenodo: version DOI [10.5281/zenodo.23529123](https://doi.org/10.5281/zenodo.23529123), concept DOI [10.5281/zenodo.23529122](https://doi.org/10.5281/zenodo.23529122).
+
 All results remain SYNTHETIC (classical simulation only).
 
 - `verify_claims` is fail-closed: empty dicts, missing required metrics (either side), unknown reported metrics, bool/str/NaN/inf values, out-of-range values, invalid winner indices and invalid tolerances all fail with an explicit `reason`. Return shape `(ok, checks)` is unchanged; new optional `n_patterns` argument bounds the winner index.
