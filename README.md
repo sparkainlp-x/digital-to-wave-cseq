@@ -1,5 +1,9 @@
 # Coherent Sequence Wave Computer (`cseq_wave`)
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23529123.svg)](https://doi.org/10.5281/zenodo.23529123)
+
+Software DOI for v0.3.0: [10.5281/zenodo.23529123](https://doi.org/10.5281/zenodo.23529123) (all versions: [10.5281/zenodo.23529122](https://doi.org/10.5281/zenodo.23529122)).
+
 A small, classical Python reference implementation of phase-based associative memory. It uses the phase-coherence function written as `C_seq = |<exp(i*theta)>|` in Mun Seok Lee's *Coherent Sequence Unified Coupled-Field Theory* (2026 preprint) as its recall-fidelity readout.
 
 **Evidence label: SYNTHETIC.** Every number below comes from seeded software runs on random bit patterns. Nothing here is measured on hardware.

@@ -9,6 +9,7 @@ authors:
     affiliation: "Spark AI NLP, Fredericton, New Brunswick, Canada"
 version: 0.3.0
 date-released: "2026-10-21"
+doi: "10.5281/zenodo.23529123"
 license: AGPL-3.0-only
 repository-code: "https://github.com/sparkainlp-x/digital-to-wave-cseq"
 abstract: >-
