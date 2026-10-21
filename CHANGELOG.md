@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (fix/verification-contract)
+## 0.3.0 (2026-10-21)
 
 All results remain SYNTHETIC (classical simulation only).
 

@@ -1,6 +1,6 @@
 {
   "title": "Coherent Sequence Wave Computer",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "upload_type": "software",
   "description": "<p>Classical, SYNTHETIC Python reference implementation of phase-based associative memory. Random bit patterns are encoded as BPSK wave-states, stored in one complex Hopfield coupling matrix and recalled by phase dynamics. Recall fidelity is read out with the phase-coherence formula C_seq = |<exp(i theta)>| from Mun Seok Lee's Coherent Sequence theory, applied to the relative phase. Includes an OES-32 block score (reported as a convergence flag, since it also fires on never-stored cues, noise and an empty memory), seeded capacity and confabulation sweeps, a fail-closed recall verdict with a cue-overlap gate calibrated on never-stored cues (which flags confabulation the OES-32 flag misses), and SHA-256 evidence passports. Not quantum hardware; not a validation of the Coherent Sequence theory; no physical claim.</p>",
   "creators": [

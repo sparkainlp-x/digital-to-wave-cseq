@@ -1,4 +1,4 @@
-"""Verified demo (v0.2.0, SYNTHETIC): recall verdicts with a calibrated cue gate.
+"""Verified demo (v0.3.0, SYNTHETIC): recall verdicts with a calibrated cue gate.
 
 1. Store 4 random 256-mode BPSK patterns in one hologram.
 2. Calibrate the cue-overlap threshold tau from seeded never-stored cues.
@@ -86,7 +86,7 @@ def main(argv=None):
     m = pp["metrics"]
     lines = [
         "=" * 64,
-        "COHERENT SEQUENCE WAVE COMPUTER - verified demo v0.2.0 (SYNTHETIC)",
+        "COHERENT SEQUENCE WAVE COMPUTER - verified demo v0.3.0 (SYNTHETIC)",
         "=" * 64,
         f"calibration: tau = {cal['tau_cue_overlap']:.4f} (null q0.99 of {cal['null_n']} never-stored cues, "
         f"median {cal['null_median']:.4f})",
