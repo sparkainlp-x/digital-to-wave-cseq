@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Documentation only: replaced the statement that the code is "this project's own choices" with a Provenance section in the README. It states which files are byte-identical to, edited from, or added to the package received under Mun Seok Lee's name, that he is not an author of this release and has not endorsed it, and that the C_seq preprint has no known DOI.
+
 ## 0.3.0 (2026-10-21)
 
 - Archived on Zenodo: version DOI [10.5281/zenodo.23529123](https://doi.org/10.5281/zenodo.23529123), concept DOI [10.5281/zenodo.23529122](https://doi.org/10.5281/zenodo.23529122).
