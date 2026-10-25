@@ -88,13 +88,28 @@ This repository is different from both. It models phase-based associative recall
 
 ## Sources and acknowledgements
 
-The `C_seq` formula and the wave-state framing come from Mun Seok Lee's work. The memory model, codec, OES-32 use, experiments and code are this project's own choices.
+The `C_seq` formula and the wave-state framing come from Mun Seok Lee's work, as supplied to this project. The verification layer, experiments, results and tests are ours; the base package is derived from the one received under his name (see Provenance below).
 
 - Lee, Mun Seok (2026). *Coherent Sequence Unified Coupled-Field Theory.* Preprint (October 2026, no DOI known to this project).
 - Lee, Mun Seok (2026). *Digital to Wave: Paradigm Shift in Quantum Wave-Based Computing and Lab-Grown Diamond Memory.* Zenodo. https://doi.org/10.5281/zenodo.21947036
 - Lee, Mun Seok (2026). *Digital to Wave: LGD In Situ Wave Memory-Human Wave Integrated Interface-Metaverse Hologram- Wave Affective AI.* Zenodo. https://doi.org/10.5281/zenodo.21947108. Cited for context only, none of it is modelled here.
 
 The original agent-instructions spec is kept unchanged in [spec/](spec/), and the first commit reproduces it exactly.
+
+## Provenance
+
+The first commit of this repository is a package received under Mun Seok Lee's name, kept unchanged in [spec/](spec/). Its metadata lists him as sole author under AGPL-3.0-only. We could not independently verify who wrote it. This repository is derived from it. Compared with that first commit (line similarity from a diff):
+
+| file | status |
+|---|---|
+| `cseq_wave/wave.py` (includes `coherence` and `alignment`, the C_seq readout) | byte-identical |
+| `tests.py` | lightly edited (about 94% of lines unchanged) |
+| `cseq_wave/encode.py`, `cseq_wave/oes.py` | edited (about 83% and 81%) |
+| `cseq_wave/memory.py`, `cseq_wave/evidence.py`, `cseq_wave/__init__.py` | edited and extended (about 71%, 60%, and new exports) |
+| `demo.py` | largely rewritten (about 28% unchanged) |
+| `cseq_wave/calibrate.py`, `claims.py`, `validation.py`, `verdict.py`, `verify.py`, `experiments/`, `results/`, `tests/`, CI | added by this project (the verification layer was adapted from a later handoff package and corrected) |
+
+[CHANGELOG.md](CHANGELOG.md) lists every change. Mun Seok Lee is not an author of this release, and he has not reviewed or endorsed this software. The *Coherent Sequence Unified Coupled-Field Theory* preprint has no DOI known to this project, so it is unpublished as far as we can tell; we implemented the C_seq formula from the supplied material and have not checked it against the preprint itself.
 
 ## How to cite
 
