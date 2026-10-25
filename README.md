@@ -103,10 +103,10 @@ The first commit of this repository is a package received under Mun Seok Lee's n
 | file | status |
 |---|---|
 | `cseq_wave/wave.py` (includes `coherence` and `alignment`, the C_seq readout) | byte-identical |
-| `tests.py` | lightly edited (about 94% of lines unchanged) |
+| `tests.py` | lightly edited (about 94% line similarity) |
 | `cseq_wave/encode.py`, `cseq_wave/oes.py` | edited (about 83% and 81%) |
 | `cseq_wave/memory.py`, `cseq_wave/evidence.py`, `cseq_wave/__init__.py` | edited and extended (about 71%, 60%, and new exports) |
-| `demo.py` | largely rewritten (about 28% unchanged) |
+| `demo.py` | largely rewritten (about 28% line similarity) |
 | `cseq_wave/calibrate.py`, `claims.py`, `validation.py`, `verdict.py`, `verify.py`, `experiments/`, `results/`, `tests/`, CI | added by this project (the verification layer was adapted from a later handoff package and corrected) |
 
 [CHANGELOG.md](CHANGELOG.md) lists every change. Mun Seok Lee is not an author of this release, and he has not reviewed or endorsed this software. The *Coherent Sequence Unified Coupled-Field Theory* preprint has no DOI known to this project, so it is unpublished as far as we can tell; we implemented the C_seq formula from the supplied material and have not checked it against the preprint itself.
