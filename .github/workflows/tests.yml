@@ -37,6 +37,13 @@ jobs:
           cat rig1.txt
           grep -q "protocol_locked=True" rig1.txt
           diff rig1.txt rig2.txt
+      - name: Round-2 benchmark, quick mode twice (plan lock + deterministic hash)
+        run: |
+          python -W error benchmark_round2.py --quick | grep -E "protocol_locked=True|deterministic_sha256" > r2a.txt
+          python -W error benchmark_round2.py --quick | grep -E "protocol_locked=True|deterministic_sha256" > r2b.txt
+          cat r2a.txt
+          grep -q "protocol_locked=True" r2a.txt
+          diff r2a.txt r2b.txt
       - name: Legacy script tests
         run: python tests.py
       - name: Demo seeds 7 and 42

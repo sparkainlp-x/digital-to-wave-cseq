@@ -7,3 +7,5 @@ report.json
 bench*.txt
 rig*.txt
 report_rigorous.json
+r2*.txt
+report_round2.json
