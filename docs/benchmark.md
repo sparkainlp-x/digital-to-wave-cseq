@@ -30,7 +30,7 @@ Limits of the lock: it is a commitment recorded in git, not an external timestam
 
 ## Determinism
 
-`deterministic_sha256` covers the protocol hash, profile, seed, reverse results, capacity results and the scaling plan (sizes, repeats, warm-up). It excludes every timing and everything derived from timings (alpha, CIs, slopes, extrapolations) and the environment. Six consecutive full runs on this machine and two quick runs gave identical hashes:
+`deterministic_sha256` covers the protocol hash, profile, seed, reverse results, capacity results and the scaling plan (sizes, repeats, warm-up). It excludes every timing and everything derived from timings (alpha, CIs, slopes, extrapolations) and the environment. Six full runs on this machine (two batches of three, same code) and repeated quick runs gave identical hashes within each profile:
 
 ```
 full : 3a906ad0db1ca828a9e54f6902e3ffeb96e0f43a0ffe98382c1a3d76445cf5a0
