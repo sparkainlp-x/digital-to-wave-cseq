@@ -6,6 +6,7 @@ Two tools live in the repo root:
 | --- | --- |
 | `benchmark.py` | The first benchmark, supplied unchanged. Quick to run; its scaling fit is unstable (see "Original tool" below). |
 | `benchmark_rigorous.py` | The upgraded benchmark: locked analysis plan, direct timings with confidence intervals, de-confounded capacity grid, null baselines, adversarial reverse tests. Settings live in `benchmark_protocol.json`. |
+| `benchmark_round3.py` | Round 3: why recall degrades (cross-talk, spurious states, mirror, dynamics), correlated patterns, multiplicity re-analysis, cache microbenchmark, complex128 timed to N = 14336. Settings live in `benchmark_protocol_round3.json`. |
 | `benchmark_round2.py` | Round 2: bit-flip and phase-noise denoising test with paired CIs, load-controlled timings, complex64 timing at N = 16384. Settings live in `benchmark_protocol_round2.json`. See "Round 2" below. |
 
 All results are **synthetic classical software**. No quantum-hardware claim is made. Noise is Gaussian phase noise added to cue phases; it does not measure any physical device.
@@ -397,12 +398,277 @@ Reading these tables:
 | Memory at N = 16384 is 4 GiB | Exact arithmetic | Unchanged for complex128; complex64 needs 2 GiB and was allocated and used |
 | "Recall denoises" (implied by the capacity story) | Not testable with sigma <= 0.25 rad | True only at low load (P/N <= 1/16: 36 of 36 cells); at P/N >= 3/16 recall is worse than the cue (30 of 36 cells) and recall never beats a nearest-stored lookup |
 
+## Round 3: why does recall degrade, correlated patterns, multiplicity, cache, large complex128
+
+Round 3 follows a locked plan, `benchmark_protocol_round3.json` and `benchmark_protocol_round3.lock` (hash `b6365f500ea5a6c1e60c8eb4db1200c6c5980e027dd409e3895a1676ff5637d4`), committed in `bf9b92f`, before `benchmark_round3.py` (`98300bc`) existed and before any round-3 experiment ran. Plan text, with the support/reject rule of every hypothesis: [round3_plan.md](round3_plan.md). The raw reports of the two full runs are in `results/round3/`. The same limits as before apply: the lock is a git commitment, not an independent timestamp, and the author knew the round-1 and round-2 results (and the cross-talk and Hadamard algebra) when writing it. Nothing has been uploaded anywhere.
+
+```sh
+python benchmark_round3.py --quick                            # CI smoke
+python benchmark_round3.py --full --json report_round3.json   # manual; 6 to 30 minutes on this shared box
+python experiments/correlated_collapse_check.py               # post hoc check, seconds
+```
+
+Both full runs have the identical `deterministic_sha256` = `a0f0b96e32855a4c2f926dd208d6154d606ab718a3abcf66ee0e25995e71fad7` (mechanism, correlated-pattern and multiplicity results, plan). Timings differ between runs and are not in the hash.
+
+**Deviations and additions (all disclosed).** (1) No change to the locked plan. (2) `benchmark_round2.bench_denoising` gained an optional `trial_sink` argument so the round-2 cells could be re-analysed; the returned results are byte-identical (tested) and the round-2 hash is unaffected. (3) In the quick profile the correlated-pattern rule uses a required drop of 1 cell instead of 6; quick mode is a smoke test only. (4) Multiple-testing families for the mechanism experiment were formed per pattern kind and per step (the plan named only `mechanism_t25`): random patterns at steps 25 and 100, Hadamard patterns at steps 25 and 100. (5) Marked "exploratory" or "post hoc" below: the step-1 tie fraction, the read of aggregate L2 in the default-thread cache result, the accuracy-versus-step peak, and the common-pattern collapse check. None of these has a pre-declared rule.
+
+### Round 3a. Why does recall get worse than the cue at high load?
+
+**The most important finding: at high load the stored patterns are not stable fixed points of the dynamics. With random patterns, recall drifts away from the stored pattern into states that are not near any stored pattern, and this happens even for an exact, uncorrupted cue. It is caused by cross-talk between the patterns: with exactly orthogonal patterns the degradation disappears.** Round 2 used 25 steps and therefore understated it: accuracy keeps falling between steps 25 and 100.
+
+x-cells (random patterns, q > 0, gain over the cue at step 25 significantly negative after Benjamini-Hochberg, family of 24 cells): 8 cells: N = 64: q 0.1, P/N 0.25; N = 128: q 0.1 at P/N 0.1875 and 0.25, q 0.3 at 0.25; N = 256: q 0.1 at 0.1875 and 0.25, q 0.3 at 0.1875 and 0.25. All hypothesis verdicts below pool these 8 cells x 50 trials = 400 trials.
+
+| Hypothesis | Pre-declared rule (short) | Result | Verdict |
+| --- | --- | --- | --- |
+| (a) cross-talk from other stored patterns | one-step error of an exact stored pattern matches the Gaussian prediction Q(sqrt((N-1)/(P-1))) in >= 75% of testable cells AND orthogonal Hadamard patterns remove the degradation in >= 80% of x-cells with >= +0.05 accuracy | a1: 8 of 8 testable cells agree (for example N = 256, P/N = 1/4: measured 0.0223, 95% CI [0.0194, 0.0252], predicted 0.0221). a2: the Hadamard one-step error is exactly 0 in every q = 0 cell; in 8 of 8 x-cells the Hadamard cell does not degrade (all 24 Hadamard q > 0 cells denoise at steps 25 and 100); mean accuracy at step 25 is +0.230 higher than with random patterns | **supported** |
+| (b) spurious states | pooled fraction of final states (step 100) farther than tau = 0.10 from every stored pattern and its negation, Wilson lower bound >= 0.50 | 397 of 400, Wilson 95% [0.978, 0.997]; by tau: 1.000 (0.02), 0.998 (0.05), 0.993 (0.10), 0.873 (0.20) | **supported** |
+| (c) sign mirror | pooled fraction near a negated stored pattern, Wilson lower bound >= 0.10 (rejected if upper <= 0.05) | 0 of 400, Wilson 95% [0.000, 0.0095] | **rejected** |
+| (d) truncation: 25 steps is not converged | accuracy changes by >= 0.02 between steps 25 and 100 and >= 25% of trials change bits | mean accuracy at step 100 minus step 25 = -0.088, 95% CI [-0.099, -0.076]; 93.5% of trials have different bits at 25 and 100; all 8 x-cells still degrade at step 100 | **supported** (as a statement about convergence; the direction is the opposite of "more steps would fix it": more steps make it worse) |
+| (d) oscillation: period-2 cycles | Wilson lower bound >= 0.10 (rejected if upper <= 0.05) | 0 of 400 period-2; 344 fixed points and 56 still changing bits in steps 98 to 100 (cause not examined: longer cycles or tie-bit flicker are candidates) | **rejected** |
+
+**Random patterns, N = 256** (mean bit accuracy vs the target at step t; last column: trials of 50 ending retrieved-target / spurious at step 100, tau = 0.10)
+
+| P/N | q | cue | step 1 | step 5 | step 25 | step 100 | target / spurious @100 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 0.0625 | 0.0 | 1.000 | 1.000 | 1.000 | 1.000 | 0.984 | 48 / 2 |
+| 0.125 | 0.0 | 1.000 | 0.998 | 0.996 | 0.980 | 0.674 | 1 / 49 |
+| 0.1875 | 0.0 | 1.000 | 0.991 | 0.964 | 0.840 | 0.627 | 0 / 50 |
+| 0.25 | 0.0 | 1.000 | 0.978 | 0.896 | 0.705 | 0.621 | 0 / 50 |
+| 0.0625 | 0.1 | 0.897 | 1.000 | 1.000 | 1.000 | 0.990 | 48 / 2 |
+| 0.125 | 0.1 | 0.896 | 0.988 | 0.993 | 0.920 | 0.663 | 0 / 50 |
+| 0.1875 | 0.1 | 0.903 | 0.970 | 0.941 | 0.782 | 0.634 | 0 / 50 |
+| 0.25 | 0.1 | 0.902 | 0.944 | 0.857 | 0.697 | 0.623 | 0 / 50 |
+| 0.0625 | 0.3 | 0.704 | 0.951 | 0.997 | 0.983 | 0.912 | 32 / 18 |
+| 0.125 | 0.3 | 0.704 | 0.875 | 0.894 | 0.778 | 0.655 | 0 / 50 |
+| 0.1875 | 0.3 | 0.694 | 0.818 | 0.770 | 0.671 | 0.627 | 0 / 50 |
+| 0.25 | 0.3 | 0.701 | 0.788 | 0.719 | 0.623 | 0.592 | 0 / 50 |
+
+**Orthogonal (Hadamard) patterns, N = 256** (mean bit accuracy vs the target at step t; last column: trials of 50 ending retrieved-target / spurious at step 100, tau = 0.10)
+
+| P/N | q | cue | step 1 | step 5 | step 25 | step 100 | target / spurious @100 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 0.0625 | 0.0 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 50 / 0 |
+| 0.125 | 0.0 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 50 / 0 |
+| 0.1875 | 0.0 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 50 / 0 |
+| 0.25 | 0.0 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 50 / 0 |
+| 0.0625 | 0.1 | 0.900 | 1.000 | 1.000 | 1.000 | 1.000 | 50 / 0 |
+| 0.125 | 0.1 | 0.899 | 1.000 | 1.000 | 1.000 | 1.000 | 50 / 0 |
+| 0.1875 | 0.1 | 0.900 | 0.997 | 1.000 | 1.000 | 1.000 | 50 / 0 |
+| 0.25 | 0.1 | 0.903 | 0.991 | 1.000 | 1.000 | 1.000 | 50 / 0 |
+| 0.0625 | 0.3 | 0.698 | 0.957 | 1.000 | 1.000 | 1.000 | 50 / 0 |
+| 0.125 | 0.3 | 0.700 | 0.877 | 0.984 | 0.987 | 0.980 | 47 / 3 |
+| 0.1875 | 0.3 | 0.701 | 0.811 | 0.926 | 0.932 | 0.928 | 35 / 15 |
+| 0.25 | 0.3 | 0.702 | 0.779 | 0.864 | 0.884 | 0.874 | 23 / 27 |
+
+**Gain over the cue, Benjamini-Hochberg verdicts (24 q > 0 cells per pattern kind; D = denoises, X = degrades, ~ = inconclusive)**
+
+| patterns | step | D | X | ~ |
+| --- | --- | --- | --- | --- |
+| random | 25 | 12 | 8 | 4 |
+| random | 100 | 7 | 15 | 2 |
+| hadamard | 25 | 24 | 0 | 0 |
+| hadamard | 100 | 24 | 0 | 0 |
+
+**Exact cue (q = 0), random patterns: does a stored pattern stay put?** (mean bit accuracy vs the stored target; trials of 50 ending near the target at step 100)
+
+| N | P/N | step 1 | step 25 | step 100 | near target @100 (tau 0.10) |
+| --- | --- | --- | --- | --- | --- |
+| 64 | 0.0625 | 1.0000 | 1.000 | 0.997 | 49 |
+| 64 | 0.125 | 0.9991 | 0.992 | 0.860 | 23 |
+| 64 | 0.1875 | 0.9909 | 0.944 | 0.739 | 2 |
+| 64 | 0.25 | 0.9766 | 0.832 | 0.718 | 2 |
+| 128 | 0.0625 | 1.0000 | 1.000 | 0.985 | 46 |
+| 128 | 0.125 | 0.9977 | 0.982 | 0.739 | 3 |
+| 128 | 0.1875 | 0.9900 | 0.910 | 0.677 | 0 |
+| 128 | 0.25 | 0.9784 | 0.792 | 0.645 | 0 |
+| 256 | 0.0625 | 1.0000 | 1.000 | 0.984 | 48 |
+| 256 | 0.125 | 0.9984 | 0.980 | 0.674 | 1 |
+| 256 | 0.1875 | 0.9911 | 0.840 | 0.627 | 0 |
+| 256 | 0.25 | 0.9777 | 0.705 | 0.621 | 0 |
+
+Reading the mechanism results:
+
+- **Cross-talk is the cause, in the sense of these two tests.** The measured one-step error of an exact stored pattern tracks the classical Gaussian cross-talk prediction in all eight cells where it is measurable (the predictions at P/N = 1/16, and at N = 64 with P/N = 1/8, are too small to measure with 50 trials and are not counted). Replacing the random patterns by exactly orthogonal ones removes the cross-talk term by construction and removes the degradation: Hadamard recall at q = 0 and q = 0.1 is 1.000 up to P/N = 1/4, and at q = 0.3 it still improves on the cue in every cell (0.87 to 1.00 vs 0.70). The residual loss at q = 0.3, P/N = 3/16 and 1/4 with Hadamard patterns (spurious fraction 15/50 and 27/50) comes from the corrupted cue itself, not from stored-pattern interference. This does not show that cross-talk is the only contributor; it shows that removing it is sufficient in this setup.
+- **The failure is convergence to spurious states, not mirror states.** In the x-cells 99.3% of final states are farther than 0.10 from every stored pattern and its negation. No final state was near a negated pattern. The spurious states were not characterised further (mixtures of stored patterns, spin-glass-like states and other possibilities are all untested); the 87% figure at tau = 0.20 shows that part of them are within 0.2 of a stored pattern.
+- **Dynamics.** At P/N >= 1/8 even an exact cue loses the pattern: at N = 256, P/N = 1/8, accuracy is 0.998 at step 1, 0.980 at step 25 and 0.674 at step 100 (1 of 50 trials still near the target at step 100). The one-step error is only 0.2% to 2%, so the failure is a slow drift (an avalanche of small errors), not an immediate flip. At P/N = 1/16, 48 of 50 exact cues at N = 256 stay near the target at step 100 and 2 do not. The round-2 verdicts at 25 steps are therefore not converged values: with BH correction the random-pattern cells split 12 D / 8 X / 4 ~ at step 25 and 7 D / 15 X / 2 ~ at step 100. Hadamard cells stay 24 D / 0 / 0 at both steps.
+- **Exploratory, not preregistered: early steps help.** In the random-pattern cells the accuracy peaks at step 2 to 5, then falls (for example N = 256, P/N = 1/8, q = 0.3: 0.875, 0.898, 0.894, 0.858, 0.778 at steps 1, 2, 5, 10, 25 against a cue of 0.704). Stopping after a few steps would denoise in some cells where 25 steps degrades. No test was run on this; the per-step means are in the JSON.
+- **Exploratory: ties.** About 0.0% to 1.1% of local fields are exactly zero at step 1 (the sum of coupling terms cancels). Because the BPSK couplings are real only up to rounding (imaginary parts below 1e-12, tested), such ties are decided by rounding noise, which makes these dynamics synchronous +-1 Hopfield dynamics with noise-broken ties. This was not shown to matter for any verdict.
+
+### Round 3b. Correlated patterns
+
+Patterns with pairwise correlation rho are built from a common random pattern c: each bit equals c with probability (1 + sqrt(rho))/2, so any two patterns have expected correlation exactly rho (realised mean pairwise overlaps 0.001, 0.099, 0.298). rho = 0 is a fresh-seed replication of round 2: for q = 0.1 and 0.3 (36 cells), 35 of 36 raw verdicts equal the round-2 verdicts; the one difference is N = 128, q = 0.3, P/N = 1/4 (round 2: degrades; round 3: inconclusive).
+
+**Correlated patterns: verdicts for q > 0 (36 cells per rho; raw and Benjamini-Hochberg give identical counts)**
+
+| rho | D | X | ~ |
+| --- | --- | --- | --- |
+| 0.0 | 24 | 7 | 5 |
+| 0.1 | 12 | 20 | 4 |
+| 0.3 | 20 | 15 | 1 |
+
+**Capacity with an exact cue (q = 0): knee = smallest tested P/N with mean bit accuracy < 0.95**
+
+| N | rho = 0 | rho = 0.1 | rho = 0.3 |
+| --- | --- | --- | --- |
+| 64 | 0.1875 | 0.125 | 0.0625 |
+| 128 | 0.1875 | 0.09375 | 0.03125 |
+| 256 | 0.1875 | 0.0625 | 0.03125 |
+
+**Mean over all 18 cells per rho (N x P/N), exact cue and q = 0.1, 0.3**
+
+| rho | q | recall bit accuracy | exact-recall fraction | cue-only accuracy | nearest-stored accuracy |
+| --- | --- | --- | --- | --- | --- |
+| 0.0 | 0.0 | 0.940 | 0.671 | 1.000 | 1.000 |
+| 0.0 | 0.1 | 0.918 | 0.627 | 0.899 | 1.000 |
+| 0.0 | 0.3 | 0.834 | 0.410 | 0.700 | 0.987 |
+| 0.1 | 0.0 | 0.804 | 0.367 | 1.000 | 1.000 |
+| 0.1 | 0.1 | 0.792 | 0.340 | 0.900 | 1.000 |
+| 0.1 | 0.3 | 0.761 | 0.234 | 0.703 | 0.990 |
+| 0.3 | 0.0 | 0.807 | 0.107 | 1.000 | 1.000 |
+| 0.3 | 0.1 | 0.804 | 0.098 | 0.899 | 1.000 |
+| 0.3 | 0.3 | 0.800 | 0.074 | 0.703 | 0.990 |
+
+**Pre-declared hypothesis (e) (correlation shrinks the denoising region: supported if the BH "denoises" count at rho = 0.3 is at least 6 below rho = 0): partial / inconclusive by the rule.** The counts are 24 (rho = 0), 12 (rho = 0.1), 20 (rho = 0.3): non-monotonic, and 20 is only 4 below 24. The gain-over-cue measure is misleading here, as the next paragraph shows, so the capacity numbers are the informative result.
+
+**Correlation strongly reduces capacity.** With an exact cue the knee moves from P/N = 3/16 (rho = 0, every N) to 1/16 to 1/8 (rho = 0.1) and 1/32 to 1/16 (rho = 0.3). The mean exact-recall fraction over the 18 cells falls from 0.671 to 0.367 to 0.107.
+
+**Post hoc explanation (not preregistered; found by reading the table after the run).** For rho = 0.1 and 0.3 the recall accuracy in the failing cells sits at (1 + sqrt(rho))/2 = 0.658 and 0.774, which is the agreement between any stored pattern and the common pattern c. The check script below confirms it: for rho = 0.3 and N >= 128 the final state is within 0.10 of c in 46 to 50 of 50 trials and within 0.10 of the target in 0 or 1 trial; for rho = 0.1 the same happens at larger P/N. So with correlated patterns, recall collapses onto the shared component, which is a spurious attractor close to every stored pattern. That is why "gain over the cue" looks positive at q = 0.3 (cue accuracy 0.70 < 0.774) while the target is not retrieved at all (exact-recall fraction 0.074 at rho = 0.3, q = 0.3). Confirmed in this single post hoc check only for exact cues, 25 steps, these N and P/N.
+
+**Post hoc collapse check** (`experiments/correlated_collapse_check.py`, exact cue, 25 steps, 50 trials per row; written after the round-3 results were seen)
+
+| rho | N | P/N | predicted agreement with c | recall accuracy vs target | final within 0.10 of c | final within 0.10 of target |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0.1 | 64 | 0.0625 | 0.6581 | 1.0 | 0 / 50 | 50 / 50 |
+| 0.1 | 64 | 0.125 | 0.6581 | 0.93 | 0 / 50 | 34 / 50 |
+| 0.1 | 64 | 0.25 | 0.6581 | 0.6978 | 20 / 50 | 2 / 50 |
+| 0.1 | 128 | 0.0625 | 0.6581 | 0.9464 | 0 / 50 | 38 / 50 |
+| 0.1 | 128 | 0.125 | 0.6581 | 0.7314 | 19 / 50 | 6 / 50 |
+| 0.1 | 128 | 0.25 | 0.6581 | 0.6617 | 50 / 50 | 0 / 50 |
+| 0.1 | 256 | 0.0625 | 0.6581 | 0.6798 | 19 / 50 | 0 / 50 |
+| 0.1 | 256 | 0.125 | 0.6581 | 0.6552 | 50 / 50 | 0 / 50 |
+| 0.1 | 256 | 0.25 | 0.6581 | 0.658 | 50 / 50 | 0 / 50 |
+| 0.3 | 64 | 0.0625 | 0.7739 | 0.9019 | 15 / 50 | 26 / 50 |
+| 0.3 | 64 | 0.125 | 0.7739 | 0.7791 | 46 / 50 | 0 / 50 |
+| 0.3 | 64 | 0.25 | 0.7739 | 0.7744 | 50 / 50 | 1 / 50 |
+| 0.3 | 128 | 0.0625 | 0.7739 | 0.7652 | 49 / 50 | 0 / 50 |
+| 0.3 | 128 | 0.125 | 0.7739 | 0.7736 | 50 / 50 | 0 / 50 |
+| 0.3 | 128 | 0.25 | 0.7739 | 0.7728 | 50 / 50 | 0 / 50 |
+| 0.3 | 256 | 0.0625 | 0.7739 | 0.772 | 50 / 50 | 0 / 50 |
+| 0.3 | 256 | 0.125 | 0.7739 | 0.7741 | 50 / 50 | 0 / 50 |
+| 0.3 | 256 | 0.25 | 0.7739 | 0.783 | 50 / 50 | 0 / 50 |
+
+### Round 3c. Multiplicity: how many round-2 verdicts survive?
+
+The round-2 denoising profile was rerun with the same seed and per-trial output. **All 126 stored round-2 cells (108 plus 18 controls) reproduced exactly.** For each of the 108 non-control cells a two-sided sign-flip permutation test (100000 permutations, add-one p-values; assumes the per-trial gain is symmetric about 0 under the null) was computed, in two families: gain over the cue and recall minus nearest-stored.
+
+| Family (108 cells) | Raw bootstrap-CI verdicts D / X / ~ | Holm-Bonferroni (alpha 0.05) | Benjamini-Hochberg (alpha 0.05) |
+| --- | --- | --- | --- |
+| recall vs cue | 61 / 37 / 10 | 57 / 36 / 15 | 61 / 37 / 10 |
+| recall vs nearest stored (D = recall better) | 0 / 79 / 29 | 0 / 72 / 36 | 0 / 78 / 30 |
+
+- Against the cue, Benjamini-Hochberg keeps all 98 significant verdicts; Holm keeps 93 (57 of 61 D, 36 of 37 X) and turns 5 into "inconclusive" (raw sign-flip p between 0.0057 and 0.027). No verdict reverses sign and no new one appears.
+- Against the nearest-stored lookup, Holm keeps 72 of 79 "recall worse" and BH keeps 78; "recall better" is 0 in every version. The statement "recall is never better than a nearest-stored lookup" survives correction; the counts of "worse" cells shrink slightly.
+- The five cells Holm drops (against the cue) are N = 64, q = 0.2, P/N = 1/4 (X); N = 128, q = 0.05, P/N = 1/8 (D); N = 256, q = 0.1 and 0.2, P/N = 1/8 (D); N = 256, sigma = 0.9, P/N = 1/16 (D). All sit at the load boundary, as expected.
+- The bootstrap-CI rule and the sign-flip test do not give identical verdicts cell by cell (one "recall worse than nearest" cell has sign-flip p = 0.126); the corrected tables above come from the sign-flip tests.
+
+### Round 3d. Cache microbenchmark for the step above N^2
+
+The VM reports L1d 48 KiB per core, L2 2 MiB per core and one L3 of 320 MiB (`lscpu`, sysfs). Dense matvec bandwidth (matrix bytes per second) was measured against working-set size for complex128 and complex64, together with a plain single-thread streaming read (numpy sum of a float64 array, 16 KiB to 1 GiB), each batch load-gated as in round 2. Two full runs:
+
+**Bandwidth drop events (effective bandwidth falls to <= 0.75 of the previous size); working-set brackets in MiB**
+
+| run | thread mode | series | events (bracket MiB, bandwidth ratio) |
+| --- | --- | --- | --- |
+| 1 | one thread | complex128 matvec | 1.0 to 2.2 (0.73); 2.2 to 4.0 (0.68); 100.0 to 144.0 (0.51) |
+| 1 | one thread | complex64 matvec | 1.1 to 2.0 (0.69); 2.0 to 4.5 (0.64); 128.0 to 200.0 (0.61) |
+| 1 | one thread | streaming read (single thread) | 0.2 to 0.3 (0.74); 101.6 to 128.0 (0.27) |
+| 1 | default threads | complex128 matvec | 16.0 to 36.0 (0.58); 196.0 to 256.0 (0.70) |
+| 1 | default threads | complex64 matvec | 8.0 to 18.0 (0.63); 200.0 to 288.0 (0.69); 288.0 to 512.0 (0.64) |
+| 1 | default threads | streaming read (single thread) | 101.6 to 128.0 (0.36) |
+| 2 | one thread | complex128 matvec | 1.0 to 2.2 (0.69); 2.2 to 4.0 (0.74); 144.0 to 196.0 (0.74) |
+| 2 | one thread | complex64 matvec | 2.0 to 4.5 (0.56); 128.0 to 200.0 (0.73) |
+| 2 | one thread | streaming read (single thread) | 0.3 to 0.4 (0.74); 161.3 to 203.2 (0.51) |
+| 2 | default threads | complex128 matvec | 4.0 to 9.0 (0.62); 9.0 to 16.0 (0.67); 16.0 to 36.0 (0.56) |
+| 2 | default threads | complex64 matvec | 8.0 to 18.0 (0.65); 288.0 to 512.0 (0.65); 800.0 to 1152.0 (0.65) |
+| 2 | default threads | streaming read (single thread) | 161.3 to 203.2 (0.63); 203.2 to 256.0 (0.64) |
+
+**complex128 matvec effective bandwidth (GB/s) around the step, one BLAS thread** (matrix size in MiB = 16 N^2 / 2^20)
+
+| N | matrix MiB | run 1 | run 2 |
+| --- | --- | --- | --- |
+| 2048 | 64 | 28.7 | 28.8 |
+| 2560 | 100 | 26.6 | 27.4 |
+| 3072 | 144 | 13.6 | 26.5 |
+| 3584 | 196 | 12.7 | 19.6 |
+| 4096 | 256 | 12.6 | 15.1 |
+| 5120 | 400 | 12.4 | 13.1 |
+| 6144 | 576 | 12.1 | 12.0 |
+| 8192 | 1024 | 11.6 | 12.1 |
+
+| Pre-declared hypothesis | One thread | Default threads |
+| --- | --- | --- |
+| m1: a matvec drop brackets a reported cache size | rule satisfied in both runs, but only through small events (1 to 4 MiB) that bracket the 2 MiB L2; the large event that corresponds to the step above N^2 (100 to 144 MiB in run 1, 144 to 196 MiB in run 2) brackets no reported cache size, in particular not the 320 MiB L3 | rejected in both runs |
+| m2: the matvec drop coincides with a drop in the plain streaming-read bandwidth | **supported in both runs**: matvec 100 to 144 MiB vs streaming cliff 101.6 to 128 MiB (26.5 to 7.2 GB/s, ratio 0.27) in run 1; matvec 144 to 196 MiB vs streaming 161 to 203 MiB (ratio 0.51) in run 2 | rejected in both runs |
+
+**Answer.** With one BLAS thread, the step above N^2 is consistent with a memory-hierarchy cliff that a plain streaming read sees at the same working-set size, and not with the 320 MiB L3 the VM reports: bandwidth falls at about 100 to 200 MiB, well below it. The cliff moved between the two runs (about 100 to 128 MiB in run 1, 144 to 203 MiB in run 2), and in rounds 1 and 2 the step was seen between 144 and 256 MiB. The pre-registered m1 rule was too permissive (it was satisfied by L2 events unrelated to the step), so the m1 "supported" label should not be read as support for the L3 explanation. With default threads (8 threads) the pre-declared criteria are not met in either run; the large drops there bracket 16 to 36 MiB and 196 to 256 MiB in run 1 and 4 to 36 MiB in run 2, so several include the 16 MiB total of the eight L2 caches (exploratory observation, not tested). Not established: why the cliff is below the reported L3 and why it moves (a guest that sees only part of a shared last-level cache, other tenants, and TLB or huge-page effects are all candidates; none was tested here). Page-table and hypervisor effects are not separated by this experiment.
+
+### Round 3e. complex128 timed directly up to N = 14336
+
+The unreachable N = 16384 (4 GiB matrix) was replaced by a chunked complex128 matrix timed at N = 8192, 10240, 12288 and 14336 (peak 3.12 GiB at 14336, under the 4 GiB cap and half of available memory when allowed). N = 12288 was not measured in run 1: after waiting 300 s the memory rule (peak at most half of MemAvailable, 4.74 GB at that moment) still failed. The N = 8192 point cross-checks the chunked implementation against round 2 (`HolographicMemory`): one thread 2.48 s (run 1) and 2.13 s (run 2) versus 2.30 s in round 2; default threads 0.308 and 0.306 s versus 0.304 to 0.321 s.
+
+**complex128 timed directly (chunked 16 N^2-byte matrix, 25 recall steps, load-controlled; median seconds [95% bootstrap CI])**
+
+| thread mode | run | N | median (s) | IQR (s) | GFLOP/s | peak GiB |
+| --- | --- | --- | --- | --- | --- | --- |
+| one thread | 1 | 8192 | 2.4758 [2.3358, 2.6117] | 0.1429 | 5.4 | 1.06 |
+| one thread | 1 | 10240 | 3.7606 [3.5005, 5.9931] | 0.2592 | 5.6 | 1.62 |
+| one thread | 1 | 12288 | not measured: memory rule (peak 2.31 GiB vs half of MemAvailable at the time, after waiting 300 s) | | | |
+| one thread | 1 | 14336 | 8.1640 [7.5491, 9.4013] | 0.5784 | 5.0 | 3.12 |
+| one thread | 2 | 8192 | 2.1267 [2.0970, 2.1554] | 0.0268 | 6.3 | 1.06 |
+| one thread | 2 | 10240 | 3.3852 [3.3283, 4.1109] | 0.1710 | 6.2 | 1.62 |
+| one thread | 2 | 12288 | 5.0188 [4.9622, 5.0573] | 0.0463 | 6.0 | 2.31 |
+| one thread | 2 | 14336 | 6.8392 [6.6964, 6.9412] | 0.1428 | 6.0 | 3.12 |
+| default threads | 1 | 8192 | 0.3080 [0.3002, 0.3230] | 0.0024 | 43.6 | 1.06 |
+| default threads | 1 | 10240 | 0.4827 [0.4711, 0.5378] | 0.0063 | 43.4 | 1.62 |
+| default threads | 1 | 12288 | 0.6981 [0.6857, 0.7553] | 0.0112 | 43.3 | 2.31 |
+| default threads | 1 | 14336 | 1.0066 [0.9603, 1.1823] | 0.0233 | 40.8 | 3.12 |
+| default threads | 2 | 8192 | 0.3056 [0.2968, 0.3198] | 0.0085 | 43.9 | 1.06 |
+| default threads | 2 | 10240 | 0.4672 [0.4479, 0.4738] | 0.0113 | 44.9 | 1.62 |
+| default threads | 2 | 12288 | 0.6740 [0.6551, 0.8020] | 0.0261 | 44.8 | 2.31 |
+| default threads | 2 | 14336 | 0.8952 [0.8726, 0.9254] | 0.0148 | 45.9 | 3.12 |
+
+**Fit on the measured sizes (N >= 8192) and extrapolation to 16384 (EXTRAPOLATED, NOT MEASURED)**
+
+| thread mode | run | points | alpha | 95% CI | extrapolated N = 16384 (s) [interval] |
+| --- | --- | --- | --- | --- | --- |
+| one thread | 1 | 3 | 2.146 | [1.931, 2.425] | 10.71 [9.65, 12.59] |
+| one thread | 2 | 4 | 2.095 | [2.011, 2.124] | 9.09 [8.91, 9.26] |
+| default threads | 1 | 4 | 2.101 | [2.015, 2.343] | 1.31 [1.26, 1.50] |
+| default threads | 2 | 4 | 1.930 | [1.853, 2.044] | 1.16 [1.13, 1.27] |
+
+- **The original claim (recall at N = 16384 in 2.2 to 3.5 s) is not matched by either thread mode.** Measured at N = 14336: 6.8 to 8.2 s with one thread and 0.90 to 1.01 s with default threads; scaling by (16384/14336)^2 = 1.31 gives about 9 to 11 s and 1.2 to 1.3 s, in line with the fit extrapolations. The claim lies between the two modes; an intermediate thread count (2 or 4) was not tested and could give a number in that range.
+- The extrapolation to N = 16384 remains an extrapolation (a 14% extension in N beyond the last measured point), with sampling-noise intervals only. complex128 at 16384 itself was not measured and cannot be under the 4 GiB cap.
+- Alpha over N >= 8192 is 2.09 to 2.15 with one thread and 1.93 to 2.10 with default threads; the CIs come from 3 to 4 points and are wide.
+
+### Round 3f. Updated claims versus results
+
+| Claim | Status after round 3 |
+| --- | --- |
+| "Recall denoises only at low load" (round 2, 25 steps) | Still true at 25 steps, but 25 steps is not a converged state: with random patterns, accuracy keeps falling to step 100 (BH verdicts 12 D / 8 X / 4 ~ at step 25, 7 / 15 / 2 at step 100), and exact stored patterns at P/N >= 1/8 drift away. The cause is cross-talk (Hadamard patterns: 24 of 24 cells denoise at both steps). |
+| "Recall never beats a nearest-stored lookup" | Survives Holm and BH correction (0 cells with recall better, in every version). |
+| Round-2 verdict counts 61 / 37 / 10 | BH: unchanged. Holm: 57 / 36 / 15. All 126 stored cells reproduce exactly. |
+| Mechanism of the high-load failure | Spurious states from cross-talk (supported); sign mirror and period-2 oscillation rejected. Which spurious states they are is unknown. |
+| Correlated patterns | Capacity falls sharply (knee P/N 3/16 to 1/32 or 1/16 at rho = 0.3); recall collapses onto the shared component (post hoc); the preregistered denoising-count rule is inconclusive and the gain-over-cue measure is misleading under collapse. |
+| The step above N^2 is a cache effect | Consistent with a memory-hierarchy cliff seen by a plain streaming read (one thread, both runs); not consistent with the reported 320 MiB L3; the cliff moves between runs. Default threads: criteria not met. |
+| complex128 at N = 16384 in 2.2 to 3.5 s | Not matched: measured 14336 and extrapolated 16384 give about 1.2 to 1.3 s (default) and 9 to 11 s (one thread). Still not measured at 16384. |
+
 ## Limitations
 
 - **Shared machine.** Timings were taken on a shared 8-core box while other jobs were running. Load averages are stored per mode in the report; high load inflates and destabilises timings, most visibly with default BLAS threads. Rerun on an idle machine before quoting numbers.
 - **Machine-dependent.** Absolute times depend on the CPU, BLAS build and thread count; only the shapes (overhead, N^2 regime, memory step) are expected to transfer.
 - **Extrapolation.** Intervals cover sampling noise of the fit only, not model error; the hold-out check shows large model error for one thread. complex128 at N = 16384 is unmeasured (round 2 measured complex64 only, a different dtype).
 - **Capacity scope.** Random BPSK patterns, one target per memory, 25 steps, Gaussian phase noise only, 40 trials per cell, a coarse P/N grid. The round-1 noise levels do not flip bits, so round 1 does not test error correction; round 2 does (see above).
+- **Round 3 scope.** Mechanism tests use random and Hadamard patterns, bit-flip cues, N = 64, 128, 256, four loads, 50 trials per cell; spurious states are defined by distance only and not characterised; the sign-flip p-values assume a symmetric null distribution of the gain; the cache microbenchmark runs on one KVM guest whose cache report may not describe the physical machine, and its pre-declared m1 rule was too permissive; two full runs only; no thread count between 1 and 8 was tested.
 - **Round 2 scope.** Random uncorrelated patterns, 3 values of N, 6 loads, 50 trials per cell, one target (the first stored pattern), 25 steps, no multiplicity correction across 108 cells, global-phase mirror not folded. Load control excludes CPU contention from other jobs but not cache, memory-bandwidth or VM effects, and timings still varied between runs by up to about 1.7x at some N. Two full runs only; one-thread complex128 N = 4096 and N = 6144 each have a usable batch in only one run.
 - **The lock** is a recorded plan in git, not an independent timestamp.
 
