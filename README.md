@@ -71,6 +71,10 @@ A cue with 20% of its phases flipped is pulled back to the exact stored pattern.
 
 Exact recall holds up to about 15 patterns (load 0.06) and breaks down past about 25 (load 0.10). Small reversals between rows are sampling noise. The full table, including fidelity, is in [results/sweeps.md](results/sweeps.md).
 
+## Benchmarks
+
+`python benchmark.py --quick` (or `--full --json report.json`) runs reverse round trips, scaling and capacity-knee benchmarks. Results at N = 4096 and 16384 are extrapolated, not measured; see [docs/benchmark.md](docs/benchmark.md) for measured vs extrapolated numbers. SYNTHETIC classical software, no quantum-hardware claim.
+
 ## Limitations
 
 1. **The OES-32 flag does not detect correct recall** (v0.2.0 adds the calibrated cue gate for that). On the recall trajectory it fired in 200 of 200 runs for stored cues, never-stored cues, uniform-noise cues *and an empty memory* (mean scores 0.98 to 0.99). For a signal in [0, 1] the score is at least the signal's mean, and the trajectory approaches 1 whenever the dynamics settle. It is kept as a convergence flag.

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added `benchmark.py` (reverse round trips, scaling, capacity knee; supplied unchanged), `docs/benchmark.md` (measured vs extrapolated, determinism, two bugs found), `experiments/measure_large_n.py` (direct timing to N = 4096) and `tests/test_benchmark.py`. Timings at N = 4096 and 16384 from `benchmark.py` are power-law extrapolations, not measurements; see the doc for how they compare with direct measurements.
 - Documentation only: replaced the statement that the code is "this project's own choices" with a Provenance section in the README. It states which files are byte-identical to, edited from, or added to the package received under Mun Seok Lee's name, that he is not an author of this release and has not endorsed it, and that the C_seq preprint has no known DOI.
 
 ## 0.3.0 (2026-10-21)

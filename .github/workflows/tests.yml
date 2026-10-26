@@ -24,6 +24,12 @@ jobs:
         run: python -m pip install -r requirements.txt -r requirements-dev.txt
       - name: pytest (warnings are errors)
         run: python -m pytest -q
+      - name: Benchmark quick run (determinism across two runs)
+        run: |
+          python -W error benchmark.py --quick | tail -1 > bench1.txt
+          python -W error benchmark.py --quick | tail -1 > bench2.txt
+          cat bench1.txt
+          diff bench1.txt bench2.txt
       - name: Legacy script tests
         run: python tests.py
       - name: Demo seeds 7 and 42
