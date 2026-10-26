@@ -171,3 +171,22 @@ def test_full_profiles_resolve_to_listed_values():
     assert s["q"] == [0.0, 0.1, 0.3] and s["p_over_n"] == [0.125, 0.1875, 0.25]
     th = p["threads"]["profiles"]["full"]
     assert th["n_modes"] == [2048, 4096, 8192] and th["thread_counts"] == [1, 2, 3, 4]
+
+
+def test_merge_thread_analysis_from_chunk_reports():
+    st = json.loads((ROOT / "benchmark_protocol_round4.json").read_text())["statistics"]
+    base = {2048: 0.2, 4096: 0.8}
+    speed = {"1": 1.0, "2": 1.9, "4": 3.6}
+    chunks = []
+    for run in (1, 2):
+        raw = {run: {m: {"large": [_fake_entry(n, t / s, 1.0 if m == "1" else float(m)) for n, t in base.items()]} for m, s in speed.items()}}
+        an = b4.analyse_threads(raw, {}, st, 1, "full")
+        batches = [{"run": run, "mode": m, "n_modes": e["n_modes"], "measured": True, "load_controlled": True,
+                    "attempts": [{"recall_seconds": e["recall_seconds"], "accepted": True, "external_busy_cores": 0.1}]}
+                   for m, d in raw[run].items() for e in d["large"]]
+        chunks.append({"analysis": an, "batches": batches, "environments": {}, "runs_included": [run]})
+    merged = b4.merge_thread_analysis(chunks, "full", 1)
+    h = merged["analysis"]["hypotheses"]
+    assert merged["runs_included"] == [1, 2]
+    assert h["T3_repeatability"]["units"] == 6 and h["T3_repeatability"]["verdict"] == "supported"
+    assert h["T1_speedup"]["units"] == 8

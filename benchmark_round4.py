@@ -590,6 +590,30 @@ def run4(profile, seed_override=None, allow_change=False, part="all", thread_run
     return rep
 
 
+def merge_thread_analysis(thr, profile, seed):
+    """Rebuild the per-batch data from the chunk reports and analyse all runs together (T2 to T4 need both runs)."""
+    protocol, _, _ = load_protocol4(True)
+    raw_runs, batches, envs, cpu = {}, [], {}, {}
+    for t in thr:
+        for r in t["analysis"]["rows"]:
+            cpu[(r["run"], r["mode"], r["n_modes"])] = r["cpu_over_wall"]
+        batches += t["batches"]
+        envs.update(t["environments"])
+    for b in batches:
+        run, mode = int(b["run"]), b["mode"]
+        entry = {"n_modes": b["n_modes"], "measured": b["measured"]}
+        if b["measured"]:
+            acc = next((i for i, a in enumerate(b["attempts"]) if a["accepted"]), None)
+            entry.update({"load_controlled": b["load_controlled"], "attempts": b["attempts"], "accepted_attempt": acc,
+                          "recall_seconds": b["attempts"][acc if acc is not None else -1]["recall_seconds"],
+                          "cpu_over_wall": cpu.get((run, mode, b["n_modes"]), float("nan"))})
+        else:
+            entry["reason"] = b["reason"]
+        raw_runs.setdefault(run, {}).setdefault(mode, {"large": []})["large"].append(entry)
+    return {"analysis": analyse_threads(raw_runs, None, protocol["statistics"], seed, profile),
+            "runs_included": sorted(raw_runs), "batches": batches, "environments": envs}
+
+
 def assemble(paths, json_out=None):
     reps = [json.loads(Path(p).read_text()) for p in paths]
     base = reps[0]
@@ -598,14 +622,16 @@ def assemble(paths, json_out=None):
     plans = [r["timing"]["plan"] for r in reps]
     assert all(p == plans[0] for p in plans), "timing plans differ"
     thr = [r["timing"] for r in reps if "analysis" in r["timing"]]
-    raw_note = "analysis of merged runs is not recomputed from raw batches; per-run analyses are kept"
+    merged = merge_thread_analysis(thr, base["profile"], base["seed"]) if thr else None
     protocol, digest, locked = load_protocol4(True)
     deterministic = {"protocol_sha256": base["protocol_sha256"], "profile": base["profile"], "seed": base["seed"],
                      "early_step": early, "spurious_states": spur, "timing_plan": plans[0]}
     return {"protocol": base["protocol"], "protocol_sha256": base["protocol_sha256"], "protocol_locked": base["protocol_locked"],
             "profile": base["profile"], "seed": base["seed"], "deterministic_sha256": canonical_digest(deterministic),
             "hash_scope": base["hash_scope"], "early_step": early, "spurious_states": spur,
-            "timing": {"plan": plans[0], "per_run_analyses": [{"runs_included": t["runs_included"], "analysis": t["analysis"]} for t in thr], "note": raw_note},
+            "timing": {"plan": plans[0], "analysis_merged": merged["analysis"] if merged else None,
+                       "runs_included": merged["runs_included"] if merged else [], "batches": merged["batches"] if merged else [],
+                       "environments": merged["environments"] if merged else {}},
             "assembled_from": [str(p) for p in paths]}
 
 
@@ -622,8 +648,9 @@ def summarize4(report):
         for k, v in s["hypotheses"].items():
             lines.append(f"spurious {k}: {v['verdict']}")
     t = report["timing"]
-    if "analysis" in t:
-        for k, v in t["analysis"]["hypotheses"].items():
+    an = t.get("analysis") or t.get("analysis_merged")
+    if an:
+        for k, v in an["hypotheses"].items():
             lines.append(f"threads {k}: {v['verdict']}")
     lines.append(f"deterministic_sha256: {report['deterministic_sha256']}")
     return "\n".join(lines)

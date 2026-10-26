@@ -1,0 +1,957 @@
+{
+  "protocol": "cseq-wave-benchmark-round4/1",
+  "protocol_sha256": "0b36a13189b51b91fedacf61336eb42a50d7daf077f00f80a3b9e4561803082f",
+  "protocol_locked": true,
+  "profile": "full",
+  "seed": 20261028,
+  "deterministic_sha256": "a921aab2128226d89369aa024bab429786b9aee255e80390bd4a066c459827c9",
+  "hash_scope": "protocol hash, profile, seed, early-step results (held-out and selection), spurious-state results, the threads plan; excludes every timing, load measurement, memory decision, CPU/wall measurement and everything derived from them",
+  "early_step": null,
+  "spurious_states": null,
+  "timing": {
+    "plan": {
+      "n_list": [
+        2048,
+        4096,
+        8192
+      ],
+      "thread_modes": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "default"
+      ],
+      "runs": 2,
+      "run_order": {
+        "run1": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "default"
+        ],
+        "run2": [
+          "default",
+          "4",
+          "3",
+          "2",
+          "1"
+        ]
+      },
+      "repeats": 7,
+      "warmup": 2,
+      "steps": 25,
+      "load_control": {
+        "threshold_external_busy_cores": 0.5,
+        "max_attempts": 4,
+        "retry_wait_seconds": 10
+      },
+      "max_peak_bytes": 4294967296,
+      "wait_for_memory_seconds": 300
+    },
+    "analysis": {
+      "rows": [
+        {
+          "run": 1,
+          "mode": "1",
+          "n_modes": 2048,
+          "median_seconds": 0.056300752999959514,
+          "ci_median": [
+            0.05344902700744569,
+            0.05762139799480792
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 1.0,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.1
+        },
+        {
+          "run": 1,
+          "mode": "2",
+          "n_modes": 2048,
+          "median_seconds": 0.030830161995254457,
+          "ci_median": [
+            0.02964937500655651,
+            0.03133310600242112
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 1.999,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.04,
+          "speedup_vs_1": 1.8261581956210813,
+          "speedup_ci": [
+            1.7096551862343103,
+            1.9080335558862171
+          ],
+          "efficiency": 0.9130790978105406
+        },
+        {
+          "run": 1,
+          "mode": "3",
+          "n_modes": 2048,
+          "median_seconds": 0.020735191006679088,
+          "ci_median": [
+            0.020134441001573578,
+            0.02116285599186085
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 2.986,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.199,
+          "speedup_vs_1": 2.715227121940872,
+          "speedup_ci": [
+            2.5497357556931095,
+            2.852370487725663
+          ],
+          "efficiency": 0.9050757073136241
+        },
+        {
+          "run": 1,
+          "mode": "4",
+          "n_modes": 2048,
+          "median_seconds": 0.01534273600555025,
+          "ci_median": [
+            0.01517839400912635,
+            0.015970346998074092
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 3.858,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.339,
+          "speedup_vs_1": 3.6695380132717306,
+          "speedup_ci": [
+            3.4232564898862936,
+            3.761332468014563
+          ],
+          "efficiency": 0.9173845033179326
+        },
+        {
+          "run": 1,
+          "mode": "default",
+          "n_modes": 2048,
+          "median_seconds": 0.010031814992544241,
+          "ci_median": [
+            0.009983006995753385,
+            0.010822491996805184
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 7.769,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.162,
+          "speedup_vs_1": 5.612220026167037,
+          "speedup_ci": [
+            5.051571673421617,
+            5.7484561726025385
+          ]
+        },
+        {
+          "run": 1,
+          "mode": "1",
+          "n_modes": 4096,
+          "median_seconds": 0.37184097501449287,
+          "ci_median": [
+            0.360185530007584,
+            0.40972830599639565
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 1.0,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.179
+        },
+        {
+          "run": 1,
+          "mode": "2",
+          "n_modes": 4096,
+          "median_seconds": 0.16022073099156842,
+          "ci_median": [
+            0.15754267000011168,
+            0.17769249201228376
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 2.005,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.222,
+          "speedup_vs_1": 2.3208043847588047,
+          "speedup_ci": [
+            2.0501042158067833,
+            2.5740312264165404
+          ],
+          "efficiency": 1.1604021923794023
+        },
+        {
+          "run": 1,
+          "mode": "3",
+          "n_modes": 4096,
+          "median_seconds": 0.11172215799160767,
+          "ci_median": [
+            0.09941027499735355,
+            0.11736960899725091
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 3.014,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.156,
+          "speedup_vs_1": 3.3282652402974957,
+          "speedup_ci": [
+            3.1037687703307304,
+            4.078244075060869
+          ],
+          "efficiency": 1.1094217467658318
+        },
+        {
+          "run": 1,
+          "mode": "4",
+          "n_modes": 4096,
+          "median_seconds": 0.0764298010035418,
+          "ci_median": [
+            0.0755833849980263,
+            0.08005293800670188
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 4.011,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.212,
+          "speedup_vs_1": 4.865130749159762,
+          "speedup_ci": [
+            4.550590347615956,
+            5.419610884762086
+          ],
+          "efficiency": 1.2162826872899406
+        },
+        {
+          "run": 1,
+          "mode": "default",
+          "n_modes": 4096,
+          "median_seconds": 0.044458998992922716,
+          "ci_median": [
+            0.04179270799795631,
+            0.045370652005658485
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 7.951,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.075,
+          "speedup_vs_1": 8.363683021151354,
+          "speedup_ci": [
+            7.982046774022846,
+            9.700720159793283
+          ]
+        },
+        {
+          "run": 1,
+          "mode": "1",
+          "n_modes": 8192,
+          "median_seconds": 2.169902292996994,
+          "ci_median": [
+            2.165293756988831,
+            2.270955344007234
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 1.0,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.123
+        },
+        {
+          "run": 1,
+          "mode": "2",
+          "n_modes": 8192,
+          "median_seconds": 1.0634390720078954,
+          "ci_median": [
+            1.040108125002007,
+            1.083040069002891
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 1.999,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.196,
+          "speedup_vs_1": 2.0404575589835803,
+          "speedup_ci": [
+            2.001875674814408,
+            2.1724969044388307
+          ],
+          "efficiency": 1.0202287794917901
+        },
+        {
+          "run": 1,
+          "mode": "3",
+          "n_modes": 8192,
+          "median_seconds": 0.6904634480015375,
+          "ci_median": [
+            0.6879018649924546,
+            0.7357838939933572
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 2.997,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.269,
+          "speedup_vs_1": 3.142675110865771,
+          "speedup_ci": [
+            2.9466689699051494,
+            3.2910088624508704
+          ],
+          "efficiency": 1.0475583702885902
+        },
+        {
+          "run": 1,
+          "mode": "4",
+          "n_modes": 8192,
+          "median_seconds": 0.52523123199353,
+          "ci_median": [
+            0.5210168670018902,
+            0.5272253880102653
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 3.995,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.212,
+          "speedup_vs_1": 4.131327615003146,
+          "speedup_ci": [
+            4.1069603365660985,
+            4.347275728522873
+          ],
+          "efficiency": 1.0328319037507865
+        },
+        {
+          "run": 1,
+          "mode": "default",
+          "n_modes": 8192,
+          "median_seconds": 0.28813856800843496,
+          "ci_median": [
+            0.28107048400852364,
+            0.29636692599160597
+          ],
+          "repeats": 7,
+          "cpu_over_wall": 7.846,
+          "attempts": 1,
+          "external_busy_cores_accepted": 0.076,
+          "speedup_vs_1": 7.530759620258377,
+          "speedup_ci": [
+            7.315632679766747,
+            8.046596571085873
+          ]
+        }
+      ],
+      "excluded_uncontrolled_batches": [],
+      "unmeasured": [],
+      "thread_effect_flags": [],
+      "hypotheses": {
+        "T1_speedup": {
+          "units": 9,
+          "satisfying": 9,
+          "verdict": "supported"
+        },
+        "T2_monotone": {
+          "units": 3,
+          "satisfying": 3,
+          "verdict": "supported"
+        },
+        "T3_repeatability": {
+          "units": 0,
+          "satisfying": 0,
+          "verdict": "not_testable"
+        },
+        "T4_original_claim": {
+          "estimates": [
+            {
+              "run": 1,
+              "mode": "1",
+              "estimate_t16384_seconds_EXTRAPOLATED_NOT_MEASURED": 12.662606537566486
+            },
+            {
+              "run": 1,
+              "mode": "2",
+              "estimate_t16384_seconds_EXTRAPOLATED_NOT_MEASURED": 7.058404070897214
+            },
+            {
+              "run": 1,
+              "mode": "3",
+              "estimate_t16384_seconds_EXTRAPOLATED_NOT_MEASURED": 4.267190874186153
+            },
+            {
+              "run": 1,
+              "mode": "4",
+              "estimate_t16384_seconds_EXTRAPOLATED_NOT_MEASURED": 3.609427781300352
+            },
+            {
+              "run": 1,
+              "mode": "default",
+              "estimate_t16384_seconds_EXTRAPOLATED_NOT_MEASURED": 1.867424734127905
+            }
+          ],
+          "verdict": "rejected",
+          "note": "EXTRAPOLATED, NOT MEASURED; complex128 at N = 16384 is not measured"
+        }
+      }
+    },
+    "environments": {
+      "run1_1": {
+        "python": "3.13.5",
+        "numpy": "2.5.4",
+        "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+        "cpu_model": "Intel(R) Xeon(R) Processor",
+        "cpu_count": 8,
+        "blas_build": {
+          "name": "scipy-openblas",
+          "found": true,
+          "version": "0.3.34.106.0",
+          "detection method": "pkgconfig",
+          "include directory": "/opt/_internal/cpython-3.13.14/lib/python3.13/site-packages/scipy_openblas64/include",
+          "lib directory": "/opt/_internal/cpython-3.13.14/lib/python3.13/site-packages/scipy_openblas64/lib",
+          "openblas configuration": "OpenBLAS 0.3.34.106.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY SkylakeX MAX_THREADS=64",
+          "pc file directory": "/project/.openblas"
+        },
+        "thread_env": {
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1",
+          "VECLIB_MAXIMUM_THREADS": "1",
+          "NUMEXPR_NUM_THREADS": "1"
+        },
+        "mem_available_bytes": 7017725952,
+        "loadavg_1_5_15_at_start": [
+          0.44287109375,
+          1.6806640625,
+          4.927734375
+        ],
+        "loadavg_1_5_15_at_end": [
+          0.69091796875,
+          1.60400390625,
+          4.78076171875
+        ],
+        "worker_wall_seconds": 32.66110968589783
+      },
+      "run1_2": {
+        "python": "3.13.5",
+        "numpy": "2.5.4",
+        "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+        "cpu_model": "Intel(R) Xeon(R) Processor",
+        "cpu_count": 8,
+        "blas_build": {
+          "name": "scipy-openblas",
+          "found": true,
+          "version": "0.3.34.106.0",
+          "detection method": "pkgconfig",
+          "include directory": "/opt/_internal/cpython-3.13.14/lib/python3.13/site-packages/scipy_openblas64/include",
+          "lib directory": "/opt/_internal/cpython-3.13.14/lib/python3.13/site-packages/scipy_openblas64/lib",
+          "openblas configuration": "OpenBLAS 0.3.34.106.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY SkylakeX MAX_THREADS=64",
+          "pc file directory": "/project/.openblas"
+        },
+        "thread_env": {
+          "OMP_NUM_THREADS": "2",
+          "OPENBLAS_NUM_THREADS": "2",
+          "MKL_NUM_THREADS": "2",
+          "VECLIB_MAXIMUM_THREADS": "2",
+          "NUMEXPR_NUM_THREADS": "2"
+        },
+        "mem_available_bytes": 6987829248,
+        "loadavg_1_5_15_at_start": [
+          0.69091796875,
+          1.60400390625,
+          4.78076171875
+        ],
+        "loadavg_1_5_15_at_end": [
+          1.123046875,
+          1.65625,
+          4.74609375
+        ],
+        "worker_wall_seconds": 15.917269945144653
+      },
+      "run1_3": {
+        "python": "3.13.5",
+        "numpy": "2.5.4",
+        "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+        "cpu_model": "Intel(R) Xeon(R) Processor",
+        "cpu_count": 8,
+        "blas_build": {
+          "name": "scipy-openblas",
+          "found": true,
+          "version": "0.3.34.106.0",
+          "detection method": "pkgconfig",
+          "include directory": "/opt/_internal/cpython-3.13.14/lib/python3.13/site-packages/scipy_openblas64/include",
+          "lib directory": "/opt/_internal/cpython-3.13.14/lib/python3.13/site-packages/scipy_openblas64/lib",
+          "openblas configuration": "OpenBLAS 0.3.34.106.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY SkylakeX MAX_THREADS=64",
+          "pc file directory": "/project/.openblas"
+        },
+        "thread_env": {
+          "OMP_NUM_THREADS": "3",
+          "OPENBLAS_NUM_THREADS": "3",
+          "MKL_NUM_THREADS": "3",
+          "VECLIB_MAXIMUM_THREADS": "3",
+          "NUMEXPR_NUM_THREADS": "3"
+        },
+        "mem_available_bytes": 6963527680,
+        "loadavg_1_5_15_at_start": [
+          1.123046875,
+          1.65625,
+          4.74609375
+        ],
+        "loadavg_1_5_15_at_end": [
+          1.412109375,
+          1.70068359375,
+          4.7265625
+        ],
+        "worker_wall_seconds": 10.455715894699097
+      },
+      "run1_4": {
+        "python": "3.13.5",
+        "numpy": "2.5.4",
+        "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+        "cpu_model": "Intel(R) Xeon(R) Processor",
+        "cpu_count": 8,
+        "blas_build": {
+          "name": "scipy-openblas",
+          "found": true,
+          "version": "0.3.34.106.0",
+          "detection method": "pkgconfig",
+          "include directory": "/opt/_internal/cpython-3.13.14/lib/python3.13/site-packages/scipy_openblas64/include",
+          "lib directory": "/opt/_internal/cpython-3.13.14/lib/python3.13/site-packages/scipy_openblas64/lib",
+          "openblas configuration": "OpenBLAS 0.3.34.106.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY SkylakeX MAX_THREADS=64",
+          "pc file directory": "/project/.openblas"
+        },
+        "thread_env": {
+          "OMP_NUM_THREADS": "4",
+          "OPENBLAS_NUM_THREADS": "4",
+          "MKL_NUM_THREADS": "4",
+          "VECLIB_MAXIMUM_THREADS": "4",
+          "NUMEXPR_NUM_THREADS": "4"
+        },
+        "mem_available_bytes": 6940041216,
+        "loadavg_1_5_15_at_start": [
+          1.412109375,
+          1.70068359375,
+          4.7265625
+        ],
+        "loadavg_1_5_15_at_end": [
+          1.810546875,
+          1.77685546875,
+          4.71875
+        ],
+        "worker_wall_seconds": 7.984765291213989
+      },
+      "run1_default": {
+        "python": "3.13.5",
+        "numpy": "2.5.4",
+        "platform": "Linux-6.12.94+-x86_64-with-glibc2.41",
+        "cpu_model": "Intel(R) Xeon(R) Processor",
+        "cpu_count": 8,
+        "blas_build": {
+          "name": "scipy-openblas",
+          "found": true,
+          "version": "0.3.34.106.0",
+          "detection method": "pkgconfig",
+          "include directory": "/opt/_internal/cpython-3.13.14/lib/python3.13/site-packages/scipy_openblas64/include",
+          "lib directory": "/opt/_internal/cpython-3.13.14/lib/python3.13/site-packages/scipy_openblas64/lib",
+          "openblas configuration": "OpenBLAS 0.3.34.106.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY SkylakeX MAX_THREADS=64",
+          "pc file directory": "/project/.openblas"
+        },
+        "thread_env": {
+          "OMP_NUM_THREADS": null,
+          "OPENBLAS_NUM_THREADS": null,
+          "MKL_NUM_THREADS": null,
+          "VECLIB_MAXIMUM_THREADS": null,
+          "NUMEXPR_NUM_THREADS": null
+        },
+        "mem_available_bytes": 6943105024,
+        "loadavg_1_5_15_at_start": [
+          1.810546875,
+          1.77685546875,
+          4.71875
+        ],
+        "loadavg_1_5_15_at_end": [
+          1.810546875,
+          1.77685546875,
+          4.71875
+        ],
+        "worker_wall_seconds": 4.73971962928772
+      }
+    },
+    "batches": [
+      {
+        "run": 1,
+        "mode": "1",
+        "n_modes": 2048,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              0.054670594006893225,
+              0.056544014005339704,
+              0.056300752999959514,
+              0.05325274699134752,
+              0.05762139799480792,
+              0.058702672002254985,
+              0.05344902700744569
+            ],
+            "external_busy_cores": 0.1,
+            "loadavg1_before": 0.44,
+            "loadavg1_after": 0.44,
+            "wall_seconds": 0.391,
+            "accepted": true
+          }
+        ]
+      },
+      {
+        "run": 1,
+        "mode": "1",
+        "n_modes": 4096,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              0.4054193650081288,
+              0.4200645859964425,
+              0.40972830599639565,
+              0.37184097501449287,
+              0.3642881269915961,
+              0.34963354900537524,
+              0.360185530007584
+            ],
+            "external_busy_cores": 0.179,
+            "loadavg1_before": 0.44,
+            "loadavg1_after": 0.49,
+            "wall_seconds": 2.681,
+            "accepted": true
+          }
+        ]
+      },
+      {
+        "run": 1,
+        "mode": "1",
+        "n_modes": 8192,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              2.1541875039984006,
+              2.171995665994473,
+              2.3818985850084573,
+              2.165293756988831,
+              2.169902292996994,
+              2.1681115689862054,
+              2.270955344007234
+            ],
+            "external_busy_cores": 0.123,
+            "loadavg1_before": 0.53,
+            "loadavg1_after": 0.63,
+            "wall_seconds": 15.482,
+            "accepted": true
+          }
+        ]
+      },
+      {
+        "run": 1,
+        "mode": "2",
+        "n_modes": 2048,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              0.03133310600242112,
+              0.029648300987901166,
+              0.02964937500655651,
+              0.03019936301279813,
+              0.03232977099833079,
+              0.03126304499164689,
+              0.030830161995254457
+            ],
+            "external_busy_cores": 0.04,
+            "loadavg1_before": 0.69,
+            "loadavg1_after": 0.69,
+            "wall_seconds": 0.215,
+            "accepted": true
+          }
+        ]
+      },
+      {
+        "run": 1,
+        "mode": "2",
+        "n_modes": 4096,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              0.17769249201228376,
+              0.17999198801408056,
+              0.15754267000011168,
+              0.17070275099831633,
+              0.15604429799714126,
+              0.16022073099156842,
+              0.15917767499922775
+            ],
+            "external_busy_cores": 0.222,
+            "loadavg1_before": 0.69,
+            "loadavg1_after": 0.69,
+            "wall_seconds": 1.161,
+            "accepted": true
+          }
+        ]
+      },
+      {
+        "run": 1,
+        "mode": "2",
+        "n_modes": 8192,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              1.040108125002007,
+              1.310407639000914,
+              1.083040069002891,
+              1.0634390720078954,
+              1.0453204049990745,
+              1.0733204059943091,
+              1.0365233100019395
+            ],
+            "external_busy_cores": 0.196,
+            "loadavg1_before": 0.88,
+            "loadavg1_after": 1.05,
+            "wall_seconds": 7.652,
+            "accepted": true
+          }
+        ]
+      },
+      {
+        "run": 1,
+        "mode": "3",
+        "n_modes": 2048,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              0.020134441001573578,
+              0.02020123200782109,
+              0.02116285599186085,
+              0.020735191006679088,
+              0.022042247001081705,
+              0.020962574999430217,
+              0.01966052000352647
+            ],
+            "external_busy_cores": 0.199,
+            "loadavg1_before": 1.12,
+            "loadavg1_after": 1.12,
+            "wall_seconds": 0.145,
+            "accepted": true
+          }
+        ]
+      },
+      {
+        "run": 1,
+        "mode": "3",
+        "n_modes": 4096,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              0.09941027499735355,
+              0.09850644100515638,
+              0.10293288200045936,
+              0.11736960899725091,
+              0.11868053900252562,
+              0.11222861398709938,
+              0.11172215799160767
+            ],
+            "external_busy_cores": 0.156,
+            "loadavg1_before": 1.12,
+            "loadavg1_after": 1.12,
+            "wall_seconds": 0.761,
+            "accepted": true
+          }
+        ]
+      },
+      {
+        "run": 1,
+        "mode": "3",
+        "n_modes": 8192,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              0.6879018649924546,
+              0.7510742529993877,
+              0.7357838939933572,
+              0.6900483830104349,
+              0.6904634480015375,
+              0.701337878999766,
+              0.6867798960010987
+            ],
+            "external_busy_cores": 0.269,
+            "loadavg1_before": 1.12,
+            "loadavg1_after": 1.27,
+            "wall_seconds": 4.943,
+            "accepted": true
+          }
+        ]
+      },
+      {
+        "run": 1,
+        "mode": "4",
+        "n_modes": 2048,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              0.01534273600555025,
+              0.01517839400912635,
+              0.015377317002275959,
+              0.014736027005710639,
+              0.015319411002565175,
+              0.015970346998074092,
+              0.016927481003222056
+            ],
+            "external_busy_cores": 0.339,
+            "loadavg1_before": 1.41,
+            "loadavg1_after": 1.41,
+            "wall_seconds": 0.109,
+            "accepted": true
+          }
+        ]
+      },
+      {
+        "run": 1,
+        "mode": "4",
+        "n_modes": 4096,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              0.0764298010035418,
+              0.0755833849980263,
+              0.07560105599986855,
+              0.07887317500717472,
+              0.07549046899657696,
+              0.08005293800670188,
+              0.08074373401177581
+            ],
+            "external_busy_cores": 0.212,
+            "loadavg1_before": 1.41,
+            "loadavg1_after": 1.41,
+            "wall_seconds": 0.543,
+            "accepted": true
+          }
+        ]
+      },
+      {
+        "run": 1,
+        "mode": "4",
+        "n_modes": 8192,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              0.5272253880102653,
+              0.5223858539975481,
+              0.5210168670018902,
+              0.5262296260043513,
+              0.5301112410088535,
+              0.52523123199353,
+              0.5168081419978989
+            ],
+            "external_busy_cores": 0.212,
+            "loadavg1_before": 1.41,
+            "loadavg1_after": 1.62,
+            "wall_seconds": 3.669,
+            "accepted": true
+          }
+        ]
+      },
+      {
+        "run": 1,
+        "mode": "default",
+        "n_modes": 2048,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              0.011392197993700393,
+              0.009983006995753385,
+              0.010023804003139958,
+              0.010822491996805184,
+              0.010369320996687748,
+              0.010031814992544241,
+              0.009871232003206387
+            ],
+            "external_busy_cores": 0.162,
+            "loadavg1_before": 1.81,
+            "loadavg1_after": 1.81,
+            "wall_seconds": 0.073,
+            "accepted": true
+          }
+        ]
+      },
+      {
+        "run": 1,
+        "mode": "default",
+        "n_modes": 4096,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              0.03920515599020291,
+              0.044929519994184375,
+              0.04179270799795631,
+              0.046584665004047565,
+              0.044162695994600654,
+              0.044458998992922716,
+              0.045370652005658485
+            ],
+            "external_busy_cores": 0.075,
+            "loadavg1_before": 1.81,
+            "loadavg1_after": 1.81,
+            "wall_seconds": 0.307,
+            "accepted": true
+          }
+        ]
+      },
+      {
+        "run": 1,
+        "mode": "default",
+        "n_modes": 8192,
+        "measured": true,
+        "load_controlled": true,
+        "attempts": [
+          {
+            "recall_seconds": [
+              0.30303970600652974,
+              0.29220093999174424,
+              0.2807293809892144,
+              0.2822255749924807,
+              0.28107048400852364,
+              0.28813856800843496,
+              0.29636692599160597
+            ],
+            "external_busy_cores": 0.076,
+            "loadavg1_before": 1.81,
+            "loadavg1_after": 1.81,
+            "wall_seconds": 2.024,
+            "accepted": true
+          }
+        ]
+      }
+    ],
+    "runs_included": [
+      1
+    ]
+  },
+  "limitations": [
+    "Synthetic classical software; no quantum-hardware, QEC or quantum-advantage claim.",
+    "Early-step results hold for random patterns, bit-flip cues and the listed N and P/N only.",
+    "Spurious-state categories are heuristic (greedy mixture detection); a state can be near a mixture of other patterns than the top-k overlaps.",
+    "Thread timings are for this shared VM; a thread setting that did not take effect is flagged through cpu_over_wall."
+  ],
+  "part": "threads"
+}
