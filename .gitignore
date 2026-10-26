@@ -5,3 +5,5 @@ __pycache__/
 evidence_passport_verified.json
 report.json
 bench*.txt
+rig*.txt
+report_rigorous.json

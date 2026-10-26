@@ -30,6 +30,13 @@ jobs:
           python -W error benchmark.py --quick | tail -1 > bench2.txt
           cat bench1.txt
           diff bench1.txt bench2.txt
+      - name: Rigorous benchmark, quick mode twice (protocol lock + deterministic hash)
+        run: |
+          python -W error benchmark_rigorous.py --quick | grep -E "protocol_locked=True|deterministic_sha256" > rig1.txt
+          python -W error benchmark_rigorous.py --quick | grep -E "protocol_locked=True|deterministic_sha256" > rig2.txt
+          cat rig1.txt
+          grep -q "protocol_locked=True" rig1.txt
+          diff rig1.txt rig2.txt
       - name: Legacy script tests
         run: python tests.py
       - name: Demo seeds 7 and 42

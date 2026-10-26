@@ -73,7 +73,10 @@ Exact recall holds up to about 15 patterns (load 0.06) and breaks down past abou
 
 ## Benchmarks
 
-`python benchmark.py --quick` (or `--full --json report.json`) runs reverse round trips, scaling and capacity-knee benchmarks. Results at N = 4096 and 16384 are extrapolated, not measured; see [docs/benchmark.md](docs/benchmark.md) for measured vs extrapolated numbers. SYNTHETIC classical software, no quantum-hardware claim.
+- `benchmark.py` (supplied unchanged): quick reverse / scaling / capacity checks.
+- `benchmark_rigorous.py`: locked analysis plan (`benchmark_protocol.json`), direct timings with bootstrap CIs in two BLAS-thread modes, a log-log fit on a range fixed in advance, capacity at the same P/N across N = 32 to 256 with null baselines, and adversarial reverse tests. `python benchmark_rigorous.py --quick` (CI) or `--full --json report_rigorous.json` (manual).
+
+N = 16384 was never measured; times there are labelled extrapolations. Timings are machine- and load-dependent. See [docs/benchmark.md](docs/benchmark.md) for the numbers, the comparison with the original claims, and the limitations. SYNTHETIC classical software, no quantum-hardware claim.
 
 ## Limitations
 

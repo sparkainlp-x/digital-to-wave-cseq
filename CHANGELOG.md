@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added `benchmark_rigorous.py` with a locked protocol (`benchmark_protocol.json` / `.lock`): direct scaling timings (N = 64 to 8192) with bootstrap CIs in two thread modes, an a-priori fit range with a CI for alpha, local slopes, a hold-out check of the extrapolation, a P/N x N x sigma capacity grid with null baselines, adversarial reverse tests, a deterministic hash that excludes timings, tests and a manual full-run workflow. `docs/benchmark.md` now reports the measured numbers and compares them with the original claims.
 - Added `benchmark.py` (reverse round trips, scaling, capacity knee; supplied unchanged), `docs/benchmark.md` (measured vs extrapolated, determinism, two bugs found), `experiments/measure_large_n.py` (direct timing to N = 4096) and `tests/test_benchmark.py`. Timings at N = 4096 and 16384 from `benchmark.py` are power-law extrapolations, not measurements; see the doc for how they compare with direct measurements.
 - Documentation only: replaced the statement that the code is "this project's own choices" with a Provenance section in the README. It states which files are byte-identical to, edited from, or added to the package received under Mun Seok Lee's name, that he is not an author of this release and has not endorsed it, and that the C_seq preprint has no known DOI.
 
