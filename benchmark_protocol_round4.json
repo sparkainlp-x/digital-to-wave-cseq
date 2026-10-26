@@ -1,0 +1,387 @@
+{
+ "protocol": "cseq-wave-benchmark-round4/1",
+ "description": "Round 4 of the SYNTHETIC classical cseq_wave benchmark (no quantum-hardware, QEC or quantum-advantage claim). Three questions left open by round 3: (1) is the early-step accuracy peak real on held-out data and does early stopping at a fixed step chosen on separate seeds beat the 25-step default and the cue; (2) what kind of states are the spurious final states at high load; (3) how does complex128 matvec-dominated recall time depend on the BLAS thread count (1, 2, 3, 4 and default). This file and its lock are committed before benchmark_round4.py exists and before any round-4 experiment is run.",
+ "round1_protocol_sha256": "826e3e6870f9e3b95b605e2e70701067b970909f196b739d8e662dd06f094c9f",
+ "round2_protocol_sha256": "a06cd2e65d18d2eac28b57a1a74e8291ab5b81b7f31f28f7637685d8f8bcc27d",
+ "round3_protocol_sha256": "b6365f500ea5a6c1e60c8eb4db1200c6c5980e027dd409e3895a1676ff5637d4",
+ "round3_results_commit": "3cc0d9c01ee30ccdf28006b97614c36bcc7b5760",
+ "author_knowledge_at_writing": "Rounds 1 to 3 are known. From round 3 (random patterns, bit-flip cues, N = 64/128/256): accuracy at steps 2 to 5 was higher than at step 25 in the cells examined and then fell to step 100 (an exploratory, not preregistered observation, made on seed 20261027 data); 397 of 400 final states at step 100 in the x-cells were farther than 0.10 from every stored pattern and its negation; 344 of 400 were fixed points and 56 were still changing bits at steps 98 to 100; complex128 timed directly to N = 14336 gave 6.8 to 8.2 s with one thread and 0.90 to 1.01 s with default (8) threads for 25 steps, threads 2 to 4 were not tested; the original claim was 2.2 to 3.5 s for N = 16384. Round 4 uses a new seed (20261028), so no round-3 trial is reused. No round-4 measurement existed when this file was written.",
+ "seed": 20261028,
+ "statistics": {
+  "paired_gain": "per-trial difference of two bit accuracies on the same trial (same patterns, same cue)",
+  "test": "two-sided sign-flip permutation test of mean difference = 0 (add-one rule, assumes symmetry about 0 under the null), same implementation as round 3",
+  "permutations": {
+   "quick": 500,
+   "full": 100000
+  },
+  "multiple_testing": "Benjamini-Hochberg at alpha = 0.05 inside each comparison family (one family per comparison, over its primary cells)",
+  "alpha": 0.05,
+  "cell_verdict": "higher / lower if BH-adjusted p < alpha and the mean difference is > 0 / < 0, otherwise not_significant",
+  "bootstrap": {
+   "ci_level": 0.95,
+   "resamples": {
+    "quick": 500,
+    "full": 10000
+   },
+   "pooled": "equal-weight mean over cells of the per-cell mean difference; trials resampled within each cell independently"
+  }
+ },
+ "early_step": {
+  "question": "Is accuracy at steps 2 to 5 reliably higher than at step 25 and at step 1, and does early stopping at the best fixed step beat the 25-step default and the cue?",
+  "dynamics": "identical to round 3 (synchronous recall from HolographicMemory.finalize() weights; trajectory checked equal to mem.recall(steps=25) on every held-out trial)",
+  "pattern_kind": "random (independent uniform +-1 patterns), target = first pattern, cue = target with each bit flipped independently with probability q",
+  "n_modes": [
+   64,
+   128,
+   256
+  ],
+  "q": [
+   0.1,
+   0.3
+  ],
+  "p_over_n_primary": [
+   0.125,
+   0.1875,
+   0.25
+  ],
+  "p_over_n_contrast_exploratory": [
+   0.0625
+  ],
+  "primary_cells": "3 N x 2 q x 3 P/N = 18 high-load cells, fixed here in advance (not chosen from data); the P/N = 1/16 contrast cells are exploratory and descriptive only",
+  "seed_sets": {
+   "selection": {
+    "purpose": "choose the fixed stopping step only; no inferential statistic is computed or reported from these trials",
+    "trials_per_cell": {
+     "quick": 10,
+     "full": 100
+    },
+    "rng": "default_rng([seed, 71, n, q_index, p])"
+   },
+   "held_out": {
+    "purpose": "every reported number and test",
+    "trials_per_cell": {
+     "quick": 20,
+     "full": 300
+    },
+    "rng": "default_rng([seed, 72, n, q_index, p])"
+   }
+  },
+  "steps_recorded": "0 to 25 (step 0 is the cue)",
+  "early_window_steps": [
+   2,
+   3,
+   4,
+   5
+  ],
+  "early_statistic": "a_early = mean over steps 2, 3, 4, 5 of the trial's bit accuracy to the target (one number per trial)",
+  "candidate_stop_steps": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   12,
+   15,
+   20,
+   25
+  ],
+  "stop_step_selection": "s_star = the candidate step with the highest equal-weight mean (over the primary cells) of selection-set bit accuracy; ties go to the smaller step. Exploratory secondary: s_star_c chosen the same way inside each cell.",
+  "comparisons": {
+   "E1a_early_vs_step25": "a_early minus accuracy at step 25",
+   "E1b_early_vs_step1": "a_early minus accuracy at step 1",
+   "E2a_stop_vs_step25": "accuracy at s_star minus accuracy at step 25",
+   "E2b_stop_vs_cue": "accuracy at s_star minus cue accuracy (step 0)"
+  },
+  "verdict_rule": {
+   "supported": "cells_higher >= ceil(0.75 * n_cells) AND pooled 95% bootstrap CI lower bound > 0 AND pooled mean difference >= 0.01",
+   "rejected": "cells_higher <= floor(0.25 * n_cells) OR pooled 95% bootstrap CI upper bound <= 0",
+   "otherwise": "partial_or_inconclusive"
+  },
+  "verdict_rule_note": "cells_higher = number of primary cells with cell verdict 'higher' in that comparison; n_cells = 18 in the full profile. Each of the four comparisons gets its own verdict word; there is no combined verdict.",
+  "reported": [
+   "s_star and the candidate list",
+   "per comparison: cells higher / not_significant / lower, pooled mean difference with 95% CI, per-cell means and BH p",
+   "held-out mean accuracy by step 0 to 25 for every primary cell (descriptive)",
+   "contrast-cell comparisons (descriptive counts only, no verdict)",
+   "s_star_c per cell and its held-out gain over step 25 (exploratory)",
+   "trajectory-vs-recall mismatches (must be 0)"
+  ],
+  "profiles": {
+   "quick": {
+    "n_modes": [
+     64
+    ],
+    "q": [
+     0.1
+    ],
+    "p_over_n_primary": [
+     0.125,
+     0.25
+    ],
+    "p_over_n_contrast_exploratory": [
+     0.0625
+    ]
+   },
+   "full": {
+    "n_modes": "as listed",
+    "q": "as listed",
+    "p_over_n_primary": "as listed",
+    "p_over_n_contrast_exploratory": "as listed"
+   }
+  }
+ },
+ "spurious_states": {
+  "question": "What kind of states does the dynamics end in at high load?",
+  "pattern_kind": "random; cue = target with bit flips at probability q; final state = bits at step 100",
+  "n_modes": [
+   64,
+   128,
+   256
+  ],
+  "q": [
+   0.0,
+   0.1,
+   0.3
+  ],
+  "p_over_n": [
+   0.125,
+   0.1875,
+   0.25
+  ],
+  "trials_per_cell": {
+   "quick": 10,
+   "full": 100
+  },
+  "rng": "default_rng([seed, 73, n, q_index, p])",
+  "definitions": {
+   "overlap": "m_mu = (xi_mu . x) / N with xi = 1 - 2*bits (+-1 form) of stored pattern mu and x the final state; a_mu = |m_mu|; nearest stored sign-symmetric distance = (1 - max a_mu) / 2",
+   "tau_stored": 0.1,
+   "tau_mixture": 0.15,
+   "stored": "max a_mu >= 1 - 2*tau_stored, i.e. within tau_stored of some stored pattern or its negation; subtypes: target or other, positive (m > 0) or negative (m < 0)",
+   "mixture_k": "for k = 3 then k = 5: take the k stored patterns with the largest a_mu, s_mu = sign(m_mu), M_k = sign(sum over those k of s_mu * xi_mu) (k odd, no ties); mixture_k if the normalised Hamming distance between x and M_k is <= tau_mixture",
+   "partial_overlap": "not stored, not mixture_3, not mixture_5, and max a_mu >= 0.5",
+   "unstructured": "none of the above (max a_mu < 0.5)",
+   "precedence": "stored, mixture_3, mixture_5, partial_overlap, unstructured (first match)",
+   "non_stored": "every final state that is not 'stored'",
+   "dynamics": "fixed_point / period_2 / still_moving exactly as in round 3 (bits at steps 98, 99, 100)",
+   "mean_direction_cosine": "|x . S| / (sqrt(N) * ||S||) with S = sum over stored patterns of xi_mu (real); the null is a uniformly random +-1 state against the same patterns",
+   "energy_per_bit": "-(x . W_real x) / (2 N) with W the finalized coupling matrix (real part); reported for final states and for the stored patterns (descriptive)"
+  },
+  "sensitivity": [
+   {
+    "tau_stored": 0.05,
+    "tau_mixture": 0.15
+   },
+   {
+    "tau_stored": 0.2,
+    "tau_mixture": 0.15
+   },
+   {
+    "tau_stored": 0.1,
+    "tau_mixture": 0.1
+   },
+   {
+    "tau_stored": 0.1,
+    "tau_mixture": 0.2
+   }
+  ],
+  "harness_checks": {
+   "positive_controls": "per trial: (i) a stored pattern with 5% random bit flips must be 'stored'; (ii) an exact sign-sum of 3 randomly chosen stored patterns with 5% flips must be 'mixture_3'; (iii) the same with 5 patterns must be 'mixture_5' or 'mixture_3' (reported as rates, no pass criterion); (iv) a uniformly random +-1 state (null) is classified and the rates reported",
+   "validity": "the harness is reported valid if the (i) and (ii) rates are >= 0.95 and the null rate of 'stored' or 'mixture' is <= 0.05; otherwise the Sp1 to Sp3 verdicts are reported 'harness_invalid'"
+  },
+  "hypotheses": {
+   "Sp1_mixture_states": {
+    "claim": "most non-stored final states are mixture_3 or mixture_5 states",
+    "measure": "pooled fraction of non-stored final states labelled mixture_3 or mixture_5; Wilson 95%",
+    "supported": "Wilson lower bound >= 0.50",
+    "rejected": "Wilson upper bound <= 0.25",
+    "otherwise": "partial_or_inconclusive"
+   },
+   "Sp2_unstructured": {
+    "claim": "most non-stored final states have no large overlap with any stored pattern",
+    "measure": "pooled fraction labelled unstructured; Wilson 95%",
+    "supported": "Wilson lower bound >= 0.50",
+    "rejected": "Wilson upper bound <= 0.25",
+    "otherwise": "partial_or_inconclusive"
+   },
+   "Sp3_partial_overlap": {
+    "claim": "most non-stored final states keep a large overlap (>= 0.5) with some stored pattern without being a mixture",
+    "measure": "pooled fraction labelled partial_overlap; Wilson 95%",
+    "supported": "Wilson lower bound >= 0.50",
+    "rejected": "Wilson upper bound <= 0.25",
+    "otherwise": "partial_or_inconclusive"
+   },
+   "Sp4_fixed_points": {
+    "claim": "non-stored final states are fixed points of the dynamics",
+    "measure": "pooled fraction of non-stored final states with dynamics class fixed_point; Wilson 95%",
+    "supported": "Wilson lower bound >= 0.75",
+    "rejected": "Wilson upper bound <= 0.50",
+    "otherwise": "partial_or_inconclusive"
+   },
+   "Sp5_mean_direction": {
+    "claim": "non-stored final states lean toward the mean of the stored patterns",
+    "measure": "per-trial paired difference (mean_direction_cosine of the final state minus that of the random null state), pooled over non-stored trials, bootstrap 95% CI of the mean",
+    "supported": "CI lower bound > 0 and mean difference >= 0.10",
+    "rejected": "CI upper bound < 0.05",
+    "otherwise": "partial_or_inconclusive"
+   }
+  },
+  "note": "Sp1 to Sp3 are mutually exclusive and exhaustive over non-stored states, so at most one can be supported. Per-q and per-P/N breakdowns are descriptive.",
+  "profiles": {
+   "quick": {
+    "n_modes": [
+     64
+    ],
+    "q": [
+     0.1
+    ],
+    "p_over_n": [
+     0.25
+    ]
+   },
+   "full": {
+    "n_modes": "as listed",
+    "q": "as listed",
+    "p_over_n": "as listed"
+   }
+  }
+ },
+ "threads": {
+  "question": "How does the time of a 25-step complex128 recall depend on the BLAS thread count?",
+  "dtype": "complex128",
+  "n_modes_requested": [
+   2048,
+   4096
+  ],
+  "n_modes_extension": [
+   8192
+  ],
+  "extension_note": "8192 is an addition to the sizes requested (2048, 4096), declared here before any measurement, so that the round-3 N = 8192 values and a scaling estimate for 16384 can be compared; it does not replace the requested sizes",
+  "thread_counts": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "reference_mode": "default (no thread environment variable set; 8 logical CPUs on this VM)",
+  "how_set": "a fresh subprocess per (run, mode) with OMP_NUM_THREADS, OPENBLAS_NUM_THREADS, MKL_NUM_THREADS, VECLIB_MAXIMUM_THREADS, NUMEXPR_NUM_THREADS all set to k",
+  "runs": {
+   "quick": 1,
+   "full": 2
+  },
+  "run_order": {
+   "run1": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "default"
+   ],
+   "run2": [
+    "default",
+    "4",
+    "3",
+    "2",
+    "1"
+   ]
+  },
+  "build": "chunked 64 MiB-row dense matrix from 8 random BPSK patterns, diagonal zeroed (round-3 builder, 16 N^2 bytes); memory rule as round 3 (peak <= 4 GiB and <= 0.5 MemAvailable, 300 s wait)",
+  "recall_steps": 25,
+  "repeats": {
+   "quick": 3,
+   "full": 7
+  },
+  "warmup": {
+   "quick": 1,
+   "full": 2
+  },
+  "load_control": {
+   "threshold_external_busy_cores": 0.5,
+   "max_attempts": 4,
+   "retry_wait_seconds": 10,
+   "same_rule_as_round2": true
+  },
+  "thread_effect_check": "for each (run, mode, N) one extra recall is timed with process CPU time and wall time; cpu_over_wall is reported (about k expected when k threads are in use). A mode whose cpu_over_wall at k >= 2 is below 1.3 at N >= 4096 is flagged 'thread setting may not have taken effect'.",
+  "statistics": {
+   "per_cell": "median recall seconds with bootstrap 95% CI of the median over the repeats",
+   "speedup": "t(k=1) / t(k) within the same run, 95% bootstrap CI (the two repeat sets resampled independently); efficiency = speedup / k"
+  },
+  "hypotheses": {
+   "T1_speedup": {
+    "claim": "more threads make the recall faster",
+    "unit": "each (run, N, k) with k in 2, 3, 4",
+    "supported": "the speedup CI lower bound is > 1.10 in >= 80% of the units",
+    "rejected": "in <= 20% of the units",
+    "otherwise": "partial_or_inconclusive"
+   },
+   "T2_monotone": {
+    "claim": "time falls monotonically from 1 to 4 threads",
+    "unit": "each (run, N): median time strictly decreasing over k = 1, 2, 3, 4",
+    "supported": ">= 5 of the 6 (or all units if fewer in quick mode, rounded up at 80%)",
+    "rejected": "<= 1 of the 6",
+    "otherwise": "partial_or_inconclusive"
+   },
+   "T3_repeatability": {
+    "claim": "the two runs agree",
+    "unit": "each (N, k incl. default): ratio of the two run medians within [0.8, 1.25]",
+    "supported": ">= 80% of the units",
+    "rejected": "<= 50% of the units",
+    "otherwise": "partial_or_inconclusive"
+   },
+   "T4_original_claim": {
+    "claim": "with at most 4 threads the original claim (recall at N = 16384 in 2.2 to 3.5 s) is reachable",
+    "estimate": "EXTRAPOLATED, NOT MEASURED: t16384(k) = t(8192) * t(8192) / t(4096) per run and mode (one more doubling at the measured 4096 to 8192 ratio)",
+    "supported": "for some k in 2, 3, 4 the estimate is <= 3.5 s in both runs",
+    "rejected": "for every k in 1 to 4 the estimate is > 3.5 s in both runs",
+    "otherwise": "partial_or_inconclusive",
+    "note": "complex128 at N = 16384 (4 GiB) is not measured, now or in round 4"
+   }
+  },
+  "profiles": {
+   "quick": {
+    "n_modes": [
+     512
+    ],
+    "thread_counts": [
+     1,
+     2
+    ],
+    "include_default": false
+   },
+   "full": {
+    "n_modes": [
+     2048,
+     4096,
+     8192
+    ],
+    "thread_counts": [
+     1,
+     2,
+     3,
+     4
+    ],
+    "include_default": true
+   }
+  }
+ },
+ "determinism": {
+  "hash_scope": "protocol hash, profile, seed, early-step results (held-out and selection), spurious-state results, the threads plan; excludes every timing, load measurement, memory decision, CPU/wall measurement and everything derived from them",
+  "ci": "quick mode is run twice in CI and the deterministic_sha256 lines are diffed; full mode is manual only"
+ },
+ "reporting": {
+  "must_report": [
+   "every hypothesis with its verdict word and the numbers behind it",
+   "held-out numbers only for the early-step questions",
+   "the selected stopping step and how it was chosen",
+   "harness checks (positive controls, null rates, trajectory mismatches)",
+   "thread-effect check values and discarded or uncontrolled timing batches",
+   "what remains unknown"
+  ],
+  "wording": "synthetic classical software; no quantum-hardware, QEC or quantum-advantage claim; timings are for this machine and this load"
+ }
+}
