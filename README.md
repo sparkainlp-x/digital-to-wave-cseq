@@ -77,6 +77,7 @@ Exact recall holds up to about 15 patterns (load 0.06) and breaks down past abou
 - `benchmark_rigorous.py`: locked analysis plan (`benchmark_protocol.json`), direct timings with bootstrap CIs in two BLAS-thread modes, a log-log fit on a range fixed in advance, capacity at the same P/N across N = 32 to 256 with null baselines, and adversarial reverse tests. `python benchmark_rigorous.py --quick` (CI) or `--full --json report_rigorous.json` (manual).
 - `benchmark_round2.py`: round-2 plan locked in `benchmark_protocol_round2.json` before the experiments: bit-flip denoising test (recall helps only at low load), load-controlled timings, complex64 timing at N = 16384.
 - `benchmark_round3.py`: round-3 plan locked in `benchmark_protocol_round3.json` before the experiments: why recall degrades at high load (cross-talk, spurious states), correlated patterns, multiplicity correction, cache microbenchmark, complex128 timed to N = 14336.
+- `benchmark_round4.py`: round-4 plan locked in `benchmark_protocol_round4.json` before the experiments: held-out early-stopping test, characterisation of the spurious states, BLAS thread counts for complex128 recall.
 
 complex128 at N = 16384 was never measured (estimates are labelled); complex64 was. Timings are machine- and load-dependent. See [docs/benchmark.md](docs/benchmark.md) for the numbers, the comparison with the original claims, and the limitations. SYNTHETIC classical software, no quantum-hardware claim.
 

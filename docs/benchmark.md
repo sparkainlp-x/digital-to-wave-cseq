@@ -6,6 +6,7 @@ Two tools live in the repo root:
 | --- | --- |
 | `benchmark.py` | The first benchmark, supplied unchanged. Quick to run; its scaling fit is unstable (see "Original tool" below). |
 | `benchmark_rigorous.py` | The upgraded benchmark: locked analysis plan, direct timings with confidence intervals, de-confounded capacity grid, null baselines, adversarial reverse tests. Settings live in `benchmark_protocol.json`. |
+| `benchmark_round4.py` | Round 4: held-out early-stopping test, spurious-state characterisation, BLAS thread counts for complex128 recall. Settings live in `benchmark_protocol_round4.json`. |
 | `benchmark_round3.py` | Round 3: why recall degrades (cross-talk, spurious states, mirror, dynamics), correlated patterns, multiplicity re-analysis, cache microbenchmark, complex128 timed to N = 14336. Settings live in `benchmark_protocol_round3.json`. |
 | `benchmark_round2.py` | Round 2: bit-flip and phase-noise denoising test with paired CIs, load-controlled timings, complex64 timing at N = 16384. Settings live in `benchmark_protocol_round2.json`. See "Round 2" below. |
 
@@ -662,12 +663,220 @@ The unreachable N = 16384 (4 GiB matrix) was replaced by a chunked complex128 ma
 | The step above N^2 is a cache effect | Consistent with a memory-hierarchy cliff seen by a plain streaming read (one thread, both runs); not consistent with the reported 320 MiB L3; the cliff moves between runs. Default threads: criteria not met. |
 | complex128 at N = 16384 in 2.2 to 3.5 s | Not matched: measured 14336 and extrapolated 16384 give about 1.2 to 1.3 s (default) and 9 to 11 s (one thread). Still not measured at 16384. |
 
+## Round 4: early stopping, what the spurious states are, BLAS threads
+
+Round 4 follows a locked plan, `benchmark_protocol_round4.json` and `benchmark_protocol_round4.lock` (hash `0b36a13189b51b91fedacf61336eb42a50d7daf077f00f80a3b9e4561803082f`, plan text in [round4_plan.md](round4_plan.md)), committed in `291dc2e` before `benchmark_round4.py` (`3f1f967`, fix `41c0262`) existed and before any full round-4 run. Results commit: `3175135`. Raw reports: `results/round4/` (`early.json`, `spurious.json`, `threads_run1.json`, `threads_run2.json`, merged `assembled.json`). Seed 20261028, so no round-3 trial is reused. Nothing was uploaded.
+
+```sh
+python benchmark_round4.py --quick                                  # CI smoke
+python benchmark_round4.py --full --json report_round4.json         # manual, all parts, about 15 minutes
+python benchmark_round4.py --full --part early --json early.json    # chunked, as run here (also --part spurious, --part threads --thread-run 1 or 2)
+python benchmark_round4.py --assemble early.json spurious.json threads_run1.json threads_run2.json --json assembled.json
+```
+
+Early-step and spurious-state hashes reproduced exactly on a second full run (`3a52bc80…7625` and `59341e60…93a8`). The assembled report has `deterministic_sha256` `7e23f21a2695e1d0a75b52d56295bce29e0a3e86eda50ba30a13d9b9b6826281` (the thread timings are not in the hash).
+
+**Disclosures and deviations.** (1) No change to the locked plan. (2) The quick profile (10 to 20 trials) was run, and its spurious-state output looked at, before the full runs; it uses the same seed streams, so its trials are the first trials of three of the full cells. A throwaway simulation with an unrelated seed was run to see how well the mixture detector recovers planted mixtures at N = 64 (about 90%); it did not change any rule. (3) The first full launch crashed at once with a TypeError because the "as listed" entries of the full profile were not resolved; the fix `41c0262` was committed before any full result existed. (4) The helper that merges the thread chunks and analyses both runs together (needed for T2 to T4) was added after the two thread chunks had run; the chunk files contain the per-run analyses and the merged analysis is a pure function of the raw batches in them (tested). (5) N = 8192 was added to the requested 2048 and 4096 as a declared extension. (6) Early-step and spurious runs used one BLAS thread; thread timings used a fresh process per mode and a quiet box (all 30 batches were accepted at the first attempt, external busy cores at most 0.36). (7) The selection scores for steps 1 and 2 were nearly tied; they are stored in the JSON under `selection_only_not_for_inference` and are not used below.
+
+### Round 4a. Early stopping (held-out data only)
+
+Random patterns, bit-flip cues q = 0.1 and 0.3, N = 64, 128, 256, P/N = 1/8, 3/16, 1/4 (18 cells fixed in advance), 300 held-out trials per cell. A separate selection seed set (100 trials per cell) chose one fixed stopping step, **step 2**, before the held-out data were evaluated. Every number below is from the held-out trials.
+
+**Early-step verdicts**
+
+| Comparison (held-out, 18 cells) | cells higher / n.s. / lower | pooled mean difference [95% CI] | Verdict |
+| --- | --- | --- | --- |
+| E1a: mean(steps 2 to 5) minus step 25 | 18 / 0 / 0 | +0.1004 [+0.0980, +0.1028] | **supported** |
+| E1b: mean(steps 2 to 5) minus step 1 | 5 / 2 / 11 | -0.0151 [-0.0163, -0.0139] | **rejected** |
+| E2a: step 2 (selected) minus step 25 | 18 / 0 / 0 | +0.1168 [+0.1141, +0.1193] | **supported** |
+| E2b: step 2 (selected) minus cue | 18 / 0 / 0 | +0.0988 [+0.0974, +0.1002] | **supported** |
+
+**What this supports.** Stopping after 2 steps instead of 25 beats the 25-step default in all 18 cells, by +0.117 on average (CI [+0.114, +0.119]), and beats the corrupted cue in all 18 cells, by +0.099 (CI [+0.097, +0.100]). The earlier statement that recall is worse than the cue at high load holds for 25 steps (rounds 2 and 3) but not for 2 steps: the failure is, to a large extent, a consequence of running the dynamics too long (round 3 showed the drift away from the stored pattern). Averaged over the 18 cells the held-out accuracy is 0.800 (cue), 0.898 (step 1), 0.899 (step 2), 0.888 (step 3), 0.867 (step 5), 0.829 (step 10) and 0.782 (step 25).
+
+**What it does not support.** The "peak at steps 2 to 5" is not a peak above step 1: step 1 is at least as good in most cells (E1b rejected: 11 cells lower, 5 higher, pooled -0.015). The best step is 1, 2 or 3 per cell and depends on load and noise (hindsight, descriptive: 1 at P/N = 1/4; 1 for q = 0.1 and 2 for q = 0.3 at 3/16; 2 for q = 0.1 and 3 for q = 0.3 at 1/8). One synchronous update already does most of the work; later steps help only a little at P/N = 1/8 and hurt at higher load. The result is for random patterns and these N and P/N; the P/N = 1/16 contrast cells (exploratory) show that where 25 steps already work, stopping early changes little (E2a +0.0004, CI [-0.0011, +0.0020]), while beating the cue by +0.18. Whether stopping early beats the nearest-stored-pattern lookup, correlated patterns, other noise types and larger N were not tested. A stopping step chosen on held-out trials would be optimistic; the one reported here was not.
+
+**Held-out accuracy by step (300 trials per cell; last 6 rows are the exploratory P/N = 1/16 contrast cells)**
+
+| N | q | P/N | cue | step 1 | step 2 | step 3 | step 5 | step 10 | step 25 | selected-per-cell step (exploratory) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 64 | 0.1 | 0.125 | 0.899 | 0.989 | 0.992 | 0.992 | 0.990 | 0.984 | 0.973 | 2 |
+| 64 | 0.1 | 0.1875 | 0.898 | 0.970 | 0.969 | 0.962 | 0.946 | 0.920 | 0.888 | 1 |
+| 64 | 0.1 | 0.25 | 0.902 | 0.949 | 0.935 | 0.914 | 0.882 | 0.837 | 0.795 | 1 |
+| 64 | 0.3 | 0.125 | 0.702 | 0.875 | 0.895 | 0.893 | 0.883 | 0.864 | 0.834 | 3 |
+| 64 | 0.3 | 0.1875 | 0.701 | 0.828 | 0.835 | 0.826 | 0.807 | 0.774 | 0.742 | 2 |
+| 64 | 0.3 | 0.25 | 0.702 | 0.788 | 0.784 | 0.766 | 0.738 | 0.707 | 0.685 | 1 |
+| 128 | 0.1 | 0.125 | 0.901 | 0.989 | 0.993 | 0.993 | 0.991 | 0.983 | 0.958 | 2 |
+| 128 | 0.1 | 0.1875 | 0.900 | 0.968 | 0.965 | 0.956 | 0.936 | 0.886 | 0.823 | 1 |
+| 128 | 0.1 | 0.25 | 0.899 | 0.946 | 0.928 | 0.905 | 0.865 | 0.798 | 0.737 | 1 |
+| 128 | 0.3 | 0.125 | 0.701 | 0.875 | 0.902 | 0.907 | 0.902 | 0.873 | 0.823 | 3 |
+| 128 | 0.3 | 0.1875 | 0.703 | 0.822 | 0.825 | 0.809 | 0.781 | 0.735 | 0.693 | 2 |
+| 128 | 0.3 | 0.25 | 0.702 | 0.786 | 0.781 | 0.761 | 0.729 | 0.691 | 0.658 | 1 |
+| 256 | 0.1 | 0.125 | 0.899 | 0.988 | 0.992 | 0.992 | 0.991 | 0.981 | 0.935 | 2 |
+| 256 | 0.1 | 0.1875 | 0.899 | 0.966 | 0.962 | 0.950 | 0.925 | 0.863 | 0.768 | 1 |
+| 256 | 0.1 | 0.25 | 0.899 | 0.946 | 0.927 | 0.899 | 0.850 | 0.768 | 0.681 | 1 |
+| 256 | 0.3 | 0.125 | 0.697 | 0.866 | 0.889 | 0.893 | 0.885 | 0.847 | 0.781 | 3 |
+| 256 | 0.3 | 0.1875 | 0.703 | 0.826 | 0.830 | 0.813 | 0.779 | 0.726 | 0.668 | 2 |
+| 256 | 0.3 | 0.25 | 0.700 | 0.787 | 0.781 | 0.759 | 0.724 | 0.682 | 0.642 | 1 |
+| 64 | 0.1 | 0.0625 | 0.902 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1 |
+| 64 | 0.3 | 0.0625 | 0.700 | 0.941 | 0.956 | 0.959 | 0.960 | 0.957 | 0.956 | 9 |
+| 128 | 0.1 | 0.0625 | 0.900 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 0.999 | 2 |
+| 128 | 0.3 | 0.0625 | 0.702 | 0.946 | 0.974 | 0.981 | 0.981 | 0.980 | 0.970 | 3 |
+| 256 | 0.1 | 0.0625 | 0.901 | 0.999 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 3 |
+| 256 | 0.3 | 0.0625 | 0.701 | 0.946 | 0.984 | 0.993 | 0.997 | 0.997 | 0.985 | 6 |
+
+**Contrast cells P/N = 1/16 (6 cells, exploratory counts only, no verdict)**
+
+| Comparison | higher / n.s. / lower | pooled mean difference [95% CI] |
+| --- | --- | --- |
+| E1a_early_vs_step25 | 2 / 4 / 0 | +0.0033 [+0.0020, +0.0046] |
+| E1b_early_vs_step1 | 4 / 2 / 0 | +0.0162 [+0.0149, +0.0176] |
+| E2a_stop_vs_step25 | 0 / 6 / 0 | +0.0004 [-0.0011, +0.0020] |
+| E2b_stop_vs_cue | 6 / 0 / 0 | +0.1845 [+0.1822, +0.1868] |
+
+### Round 4b. What are the spurious final states?
+
+Random patterns, N = 64, 128, 256, q = 0, 0.1, 0.3, P/N = 1/8, 3/16, 1/4, 100 trials per cell, final state at step 100 (2700 states). Categories with precedence: stored (within 0.10 of a stored pattern or its negation), mixture_3 or mixture_5 (within 0.15 of the sign of the sum of the 3 or 5 stored patterns with the largest overlaps), partial_overlap (largest overlap at least 0.5), unstructured (largest overlap below 0.5). Of the 2700 states, 186 (6.9%) are stored (142 the target, 21 another stored pattern, 23 a negated one) and 2514 are not.
+
+**Spurious-state hypotheses**
+
+| Hypothesis | Measure | Result | Verdict |
+| --- | --- | --- | --- |
+| Sp1_mixture_states | fraction of 2514 non-stored states | 1646 / 2514 = 0.655, Wilson 95% [0.636, 0.673] | **supported** |
+| Sp2_unstructured | fraction of 2514 non-stored states | 733 / 2514 = 0.292, Wilson 95% [0.274, 0.310] | **partial or inconclusive** |
+| Sp3_partial_overlap | fraction of 2514 non-stored states | 135 / 2514 = 0.054, Wilson 95% [0.046, 0.063] | **rejected** |
+| Sp4_fixed_points | fraction of 2514 non-stored states | 2133 / 2514 = 0.848, Wilson 95% [0.834, 0.862] | **supported** |
+| Sp5_mean_direction | paired cosine with the mean of the stored patterns, final minus random state | 0.190 vs 0.071; difference +0.118, 95% CI [+0.112, +0.124] | **supported** |
+
+**Pooled, the non-stored states are mostly mixture states (65.5%), fixed points (84.8%), and lean toward the mean of the stored patterns. But the pooled number hides a strong dependence on N** (descriptive, same rules applied per N after the fact): at N = 64, 735 of 738 non-stored states are mixtures (Wilson [0.988, 0.999]); at N = 128, 752 of 876 (0.86); at N = 256, 159 of 900 (0.18, Wilson [0.153, 0.203]) while 650 of 900 (0.72, Wilson [0.692, 0.750]) are unstructured. The unstructured share at N = 256 rises with load (45% at P/N = 1/8, 82% at 3/16, 90% at 1/4). At large N the dynamics ends in states that have no large overlap with any stored pattern (the classical spin-glass picture is consistent with this, but it was not tested here); at small N it ends in mixtures of 3 or 5 stored patterns. The pooled "mixture supported" verdict is therefore a statement about this N mix (a third each of N = 64, 128, 256), not a general one.
+
+**Final-state categories (step 100, 100 trials per cell, q pooled)**
+
+| Cells | Final states | Stored | mixture_3 | mixture_5 | partial_overlap | unstructured | Mixture share of non-stored | Unstructured share of non-stored |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| all 27 cells | 2700 | 186 (7%) | 1042 | 604 | 135 | 733 | 0.65 | 0.29 |
+| N = 64 | 900 | 162 (18%) | 629 | 106 | 2 | 1 | 1.00 | 0.00 |
+| N = 128 | 900 | 24 (3%) | 396 | 356 | 42 | 82 | 0.86 | 0.09 |
+| N = 256 | 900 | 0 (0%) | 17 | 142 | 91 | 650 | 0.18 | 0.72 |
+| N = 64, P/N = 0.125 | 300 | 119 (40%) | 171 | 9 | 1 | 0 | 0.99 | 0.00 |
+| N = 64, P/N = 0.1875 | 300 | 27 (9%) | 241 | 32 | 0 | 0 | 1.00 | 0.00 |
+| N = 64, P/N = 0.25 | 300 | 16 (5%) | 217 | 65 | 1 | 1 | 0.99 | 0.00 |
+| N = 128, P/N = 0.125 | 300 | 23 (8%) | 205 | 66 | 5 | 1 | 0.98 | 0.00 |
+| N = 128, P/N = 0.1875 | 300 | 1 (0%) | 122 | 135 | 13 | 29 | 0.86 | 0.10 |
+| N = 128, P/N = 0.25 | 300 | 0 (0%) | 69 | 155 | 24 | 52 | 0.75 | 0.17 |
+| N = 256, P/N = 0.125 | 300 | 0 (0%) | 14 | 106 | 45 | 135 | 0.40 | 0.45 |
+| N = 256, P/N = 0.1875 | 300 | 0 (0%) | 2 | 27 | 26 | 245 | 0.10 | 0.82 |
+| N = 256, P/N = 0.25 | 300 | 0 (0%) | 1 | 9 | 20 | 270 | 0.03 | 0.90 |
+
+- **The mean-direction effect is small.** The cosine between the final state and the mean of the stored patterns is 0.190 against 0.071 for a random state (+0.118). It is a modest lean, not a collapse onto the mean (compare the correlated-pattern collapse in round 3, where the patterns themselves share a common component).
+- **Fixed points.** 84.8% of non-stored states are fixed points (94% at N = 64, 89% at N = 128, 73% at N = 256); none is a period-2 cycle. The still-moving fraction is largest for partial overlaps (41 of 135) and unstructured states (170 of 733).
+- **Energy.** With the real coupling matrix, the final non-stored states are deeper energy minima than the stored patterns once P/N exceeds about 1/8 (descriptive; N = 256, P/N = 1/4: -160.9 against -127.7 per bit in the same units). Deeper than the stored patterns is what makes them attractors that win over the target.
+- **Detector limits.** The classifier is greedy (top-k overlaps) and a state can be near a mixture of other patterns than the ones it picks. Planted 3-mixtures with 5% noise are recovered 96.3% of the time (89.4% at N = 64, 99.3% at N = 128, 100% at N = 256), planted 5-mixtures only 70.9% (44.8% at N = 64). A random state is never classified as stored or mixture. So the mixture counts at N = 64 and 128 are, if anything, lower bounds, and the "unstructured" count at N = 256 is little affected. The result depends on the thresholds: with tau_mixture = 0.10 the mixture count falls to 891 of 2700, with 0.20 it rises to 2310 (table below), so the shares of mixture and unstructured states are definition-dependent. The harness criteria were met (stored 98.1%, mixture_3 96.3%, null 0%).
+
+**Sensitivity (pooled, 2700 final states)**
+
+| tau_stored / tau_mixture | stored | mixture (3 or 5) | partial_overlap | unstructured |
+| --- | --- | --- | --- | --- |
+| 0.05/0.15 | 94 | 1734 | 139 | 733 |
+| 0.2/0.15 | 852 | 1004 | 111 | 733 |
+| 0.1/0.1 | 186 | 891 | 607 | 1016 |
+| 0.1/0.2 | 186 | 2310 | 6 | 198 |
+
+**Harness controls (2700 draws; by N descriptive)**
+
+| Control | pooled | N = 64 | N = 128 | N = 256 |
+| --- | --- | --- | --- | --- |
+| stored_5pct_flips_is_stored | 0.981 | 0.956 | 0.988 | 0.999 |
+| mixture3_5pct_flips_is_mixture3 | 0.963 | 0.894 | 0.993 | 1.000 |
+| mixture5_5pct_flips_is_mixture5 | 0.709 | 0.448 | 0.717 | 0.963 |
+| mixture5_5pct_flips_is_mixture3_or_5 | 0.866 | 0.754 | 0.861 | 0.983 |
+| null_random_is_stored | 0.000 | 0.000 | 0.000 | 0.000 |
+| null_random_is_mixture | 0.000 | 0.000 | 0.000 | 0.000 |
+
+**Dynamics of non-stored final states**
+
+| Category | fixed point | period 2 | still moving |
+| --- | --- | --- | --- |
+| mixture_3 | 948 | 0 | 94 |
+| mixture_5 | 528 | 0 | 76 |
+| partial_overlap | 94 | 0 | 41 |
+| unstructured | 563 | 0 | 170 |
+
+**Energy per bit (descriptive; lower is deeper)**
+
+| N | P/N | final non-stored states (mean over q, cells) | stored patterns (first 4 per trial, same trials) |
+| --- | --- | --- | --- |
+| 64 | 0.125 | -31.5 | -31.7 |
+| 64 | 0.1875 | -34.3 | -31.5 |
+| 64 | 0.25 | -37.0 | -31.4 |
+| 128 | 0.125 | -63.5 | -63.5 |
+| 128 | 0.1875 | -71.7 | -63.5 |
+| 128 | 0.25 | -77.7 | -63.2 |
+| 256 | 0.125 | -132.0 | -127.6 |
+| 256 | 0.1875 | -147.7 | -127.4 |
+| 256 | 0.25 | -160.9 | -127.7 |
+
+### Round 4c. BLAS threads, complex128, 25-step recall
+
+N = 2048 and 4096 as requested, N = 8192 as a declared extension; 1, 2, 3, 4 and default threads (8 on this VM); two runs in opposite mode order; 7 repeats per batch, load-gated as before (every batch passed at the first attempt). The extra CPU/wall column checks that the thread setting took effect: it is 1.0, 2.0, 3.0 and 4.0 (within 0.14) for 1 to 4 threads and 7.8 to 7.95 for default, so no mode was flagged.
+
+**Median seconds for 25 recall steps, complex128 (7 repeats per batch; 95% CI of the median; speedup = t(1 thread)/t(k) in the same run)**
+
+| N | threads | run 1 seconds | run 1 speedup [CI] | run 2 seconds | run 2 speedup [CI] | cpu/wall (run 1, run 2) |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2048 | 1 | 0.0563 [0.0534, 0.0576] | 1 | 0.0585 [0.0577, 0.0607] | 1 | 1.00, 1.00 |
+| 2048 | 2 | 0.0308 [0.0296, 0.0313] | 1.83 [1.71, 1.91] | 0.0312 [0.0300, 0.0324] | 1.88 [1.78, 1.97] | 2.00, 1.99 |
+| 2048 | 3 | 0.0207 [0.0201, 0.0212] | 2.72 [2.55, 2.85] | 0.0210 [0.0205, 0.0214] | 2.78 [2.69, 2.95] | 2.99, 3.00 |
+| 2048 | 4 | 0.0153 [0.0152, 0.0160] | 3.67 [3.42, 3.76] | 0.0168 [0.0163, 0.0173] | 3.49 [3.34, 3.63] | 3.86, 4.00 |
+| 2048 | default | 0.0100 [0.0100, 0.0108] | 5.61 [5.05, 5.75] | 0.0105 [0.0104, 0.0122] | 5.57 [4.74, 5.80] | 7.77, 7.90 |
+| 4096 | 1 | 0.3718 [0.3602, 0.4097] | 1 | 0.3191 [0.3166, 0.3276] | 1 | 1.00, 1.00 |
+| 4096 | 2 | 0.1602 [0.1575, 0.1777] | 2.32 [2.05, 2.57] | 0.1556 [0.1527, 0.1647] | 2.05 [1.92, 2.12] | 2.00, 2.00 |
+| 4096 | 3 | 0.1117 [0.0994, 0.1174] | 3.33 [3.10, 4.08] | 0.1033 [0.1019, 0.1066] | 3.09 [2.97, 3.20] | 3.01, 3.01 |
+| 4096 | 4 | 0.0764 [0.0756, 0.0801] | 4.87 [4.55, 5.42] | 0.0741 [0.0732, 0.0754] | 4.31 [4.20, 4.44] | 4.01, 4.05 |
+| 4096 | default | 0.0445 [0.0418, 0.0454] | 8.36 [7.98, 9.70] | 0.0411 [0.0397, 0.0450] | 7.76 [7.03, 8.14] | 7.95, 7.85 |
+| 8192 | 1 | 2.1699 [2.1653, 2.2710] | 1 | 2.1316 [2.1174, 2.1659] | 1 | 1.00, 1.00 |
+| 8192 | 2 | 1.0634 [1.0401, 1.0830] | 2.04 [2.00, 2.17] | 1.0410 [1.0260, 1.0491] | 2.05 [2.02, 2.10] | 2.00, 2.00 |
+| 8192 | 3 | 0.6905 [0.6879, 0.7358] | 3.14 [2.95, 3.29] | 0.6881 [0.6854, 0.7066] | 3.10 [3.00, 3.15] | 3.00, 3.00 |
+| 8192 | 4 | 0.5252 [0.5210, 0.5272] | 4.13 [4.11, 4.35] | 0.5135 [0.5042, 0.5266] | 4.15 [4.03, 4.27] | 4.00, 4.00 |
+| 8192 | default | 0.2881 [0.2811, 0.2964] | 7.53 [7.32, 8.05] | 0.2853 [0.2783, 0.2913] | 7.47 [7.28, 7.78] | 7.85, 7.93 |
+
+**Thread hypotheses and extrapolation to N = 16384 (EXTRAPOLATED, NOT MEASURED)**
+
+| Hypothesis | Units satisfying | Verdict |
+| --- | --- | --- |
+| T1_speedup | 18 of 18 | **supported** |
+| T2_monotone | 6 of 6 | **supported** |
+| T3_repeatability | 15 of 15 | **supported** |
+| T4_original_claim | see table | **rejected** |
+
+| Threads | declared estimate run 1 / run 2 (t8192 squared over t4096) | exploratory: 4 x t8192 run 1 / run 2 |
+| --- | --- | --- |
+| 1 | 12.66 s / 14.24 s | 8.68 s / 8.53 s |
+| 2 | 7.06 s / 6.97 s | 4.25 s / 4.16 s |
+| 3 | 4.27 s / 4.59 s | 2.76 s / 2.75 s |
+| 4 | 3.61 s / 3.56 s | 2.10 s / 2.05 s |
+| default | 1.87 s / 1.98 s | 1.15 s / 1.14 s |
+
+
+- **Time falls monotonically from 1 to 4 threads and the two runs agree** (T1, T2, T3 supported: 18 of 18, 6 of 6 and 15 of 15 units). Efficiency (speedup divided by threads) is 0.87 to 0.94 at N = 2048, 1.02 to 1.05 at N = 8192 and 1.03 to 1.22 at N = 4096 (the single-thread time at N = 4096 is 5.5 to 6.6 times the time at N = 2048, more than N^2 predicts (4), which inflates the speedups there; this fits with the round-3 cache-size cliff for one thread, but this experiment did not test that). Default threads (8) give 5.6 to 8.4 times the single-thread speed.
+- **Original claim (recall at N = 16384 in 2.2 to 3.5 s).** T4 is **rejected** by the pre-declared estimator: the extrapolation t(8192)^2 / t(4096) gives 3.61 s and 3.56 s with 4 threads (3 threads: 4.3 to 4.6 s), just above the 3.5 s limit, 1.9 to 2.0 s with default threads. That estimator is crude because the 8192 / 4096 time ratio (5.8 to 6.9) is larger than the N^2 value 4, which the one-doubling extrapolation compounds. An exploratory estimate that scales the measured 8192 time by 4 gives 2.05 to 2.10 s (4 threads), 2.75 s (3 threads) and 4.2 s (2 threads), which would be inside the claimed range for 3 to 4 threads; the round-3 measurement at N = 14336 with one thread (6.8 to 8.2 s against 2.1 to 2.2 s at 8192 here) supports about N^2 scaling above 8192. Both estimates are extrapolations; **complex128 at N = 16384 has still not been measured** (4 GiB matrix, over the cap), and neither estimate is a measurement of the claim. The accurate statement is: with 4 threads the original claim is neither confirmed nor excluded; with the pre-declared estimator it is slightly outside, with a plain N^2 scaling it is inside. Measuring N = 14336 with 3 and 4 threads (3.1 GiB, fits) would settle it and was not part of the plan.
+
+### Round 4d. Updated claims versus results
+
+| Claim | Status after round 4 |
+| --- | --- |
+| "Recall is worse than the cue at high load" (rounds 2 and 3) | True for 25 steps. False for 2 steps: stopping after 2 steps (chosen on separate seeds) beats the cue in 18 of 18 high-load cells (+0.099) and beats 25 steps in 18 of 18 (+0.117), random patterns. |
+| "Accuracy peaks at steps 2 to 5" (round 3, exploratory) | Not confirmed as stated: steps 2 to 5 are far above step 25 (18 of 18) but not above step 1 (rejected). The best step is 1 to 3. |
+| Spurious states at high load | Mostly not stored patterns (93%). At N = 64 and 128 they are mixtures of 3 or 5 stored patterns (99.6% and 86%); at N = 256 they are mostly unstructured (72%, rising with load). 85% are fixed points; they are deeper energy minima than the stored patterns at P/N of 3/16 and above; the lean toward the mean pattern is small. Definition-dependent (thresholds), classifier limits stated above. |
+| More BLAS threads make the 25-step complex128 recall faster | Supported: near-linear from 1 to 4 threads, repeatable across two runs (efficiency 0.87 to 1.22); default (8) threads 5.6 to 8.4 times. |
+| complex128 at N = 16384 in 2.2 to 3.5 s | Still not measured. Pre-declared estimate for 4 threads: 3.6 s (rejected by a hair); plain N^2 scaling from 8192: 2.05 to 2.10 s. Unresolved. |
+
 ## Limitations
 
 - **Shared machine.** Timings were taken on a shared 8-core box while other jobs were running. Load averages are stored per mode in the report; high load inflates and destabilises timings, most visibly with default BLAS threads. Rerun on an idle machine before quoting numbers.
 - **Machine-dependent.** Absolute times depend on the CPU, BLAS build and thread count; only the shapes (overhead, N^2 regime, memory step) are expected to transfer.
 - **Extrapolation.** Intervals cover sampling noise of the fit only, not model error; the hold-out check shows large model error for one thread. complex128 at N = 16384 is unmeasured (round 2 measured complex64 only, a different dtype).
 - **Capacity scope.** Random BPSK patterns, one target per memory, 25 steps, Gaussian phase noise only, 40 trials per cell, a coarse P/N grid. The round-1 noise levels do not flip bits, so round 1 does not test error correction; round 2 does (see above).
+- **Round 4 scope.** The early-stopping result is for random patterns, bit-flip cues, N = 64 to 256 and P/N = 1/8 to 1/4 (and not compared with the nearest-stored lookup); the spurious-state categories are heuristic and threshold-dependent, N dominates their composition, and the planted-mixture recovery is imperfect at N = 64; thread timings are for one shared 8-CPU VM and one BLAS build; N = 16384 complex128 is still unmeasured.
 - **Round 3 scope.** Mechanism tests use random and Hadamard patterns, bit-flip cues, N = 64, 128, 256, four loads, 50 trials per cell; spurious states are defined by distance only and not characterised; the sign-flip p-values assume a symmetric null distribution of the gain; the cache microbenchmark runs on one KVM guest whose cache report may not describe the physical machine, and its pre-declared m1 rule was too permissive; two full runs only; no thread count between 1 and 8 was tested.
 - **Round 2 scope.** Random uncorrelated patterns, 3 values of N, 6 loads, 50 trials per cell, one target (the first stored pattern), 25 steps, no multiplicity correction across 108 cells, global-phase mirror not folded. Load control excludes CPU contention from other jobs but not cache, memory-bandwidth or VM effects, and timings still varied between runs by up to about 1.7x at some N. Two full runs only; one-thread complex128 N = 4096 and N = 6144 each have a usable batch in only one run.
 - **The lock** is a recorded plan in git, not an independent timestamp.
