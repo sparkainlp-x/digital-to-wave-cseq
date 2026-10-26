@@ -161,3 +161,13 @@ def test_chunked_quick_equals_single_quick_hash(tmp_path):
 def test_quick_cli_prints_lock_and_hash():
     out = subprocess.run([sys.executable, str(ROOT / "benchmark_round4.py"), "--quick", "--part", "early"], capture_output=True, text=True, check=True).stdout
     assert "protocol_locked=True" in out and "deterministic_sha256:" in out
+
+
+def test_full_profiles_resolve_to_listed_values():
+    p = json.loads((ROOT / "benchmark_protocol_round4.json").read_text())
+    e = b4.resolve_profile(p["early_step"], "full")
+    assert e["n_modes"] == [64, 128, 256] and e["q"] == [0.1, 0.3] and e["p_over_n_primary"] == [0.125, 0.1875, 0.25]
+    s = b4.resolve_profile(p["spurious_states"], "full")
+    assert s["q"] == [0.0, 0.1, 0.3] and s["p_over_n"] == [0.125, 0.1875, 0.25]
+    th = p["threads"]["profiles"]["full"]
+    assert th["n_modes"] == [2048, 4096, 8192] and th["thread_counts"] == [1, 2, 3, 4]

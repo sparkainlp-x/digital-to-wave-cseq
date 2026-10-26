@@ -63,6 +63,11 @@ def load_protocol4(allow_change=False):
     return protocol, digest, ok
 
 
+def resolve_profile(block, profile):
+    """Profile settings with the 'as listed' entries replaced by the block's top-level lists."""
+    return {k: (block[k] if v == "as listed" else v) for k, v in block["profiles"][profile].items()}
+
+
 def _n(x, key, profile):
     """Value that may be a {quick, full} dict."""
     return x[key][profile] if isinstance(x[key], dict) else x[key]
@@ -123,7 +128,7 @@ def compare_family(gain_list, fam_id, seed, B, alpha):
 
 
 def bench_early(profile, ep, st, seed):
-    prof = ep["profiles"][profile]
+    prof = resolve_profile(ep, profile)
     sel_t = _n(ep["seed_sets"]["selection"], "trials_per_cell", profile)
     ho_t = _n(ep["seed_sets"]["held_out"], "trials_per_cell", profile)
     B = st["permutations"][profile]
@@ -243,7 +248,7 @@ def _is_stored(c):
 
 
 def bench_spurious(profile, sp, st, seed):
-    prof = sp["profiles"][profile]
+    prof = resolve_profile(sp, profile)
     trials = _n(sp, "trials_per_cell", profile)
     df = sp["definitions"]
     tau, tmix = df["tau_stored"], df["tau_mixture"]
