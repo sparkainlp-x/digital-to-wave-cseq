@@ -86,7 +86,7 @@ def _cue(kind, level, target, n, rng):
     return phase, wave_to_bits(WaveState(np.ones(n), phase))
 
 
-def bench_denoising(prof, seed, steps, resamples, level_ci):
+def bench_denoising(prof, seed, steps, resamples, level_ci, trial_sink=None):
     rows = []
     kinds = [("bit_flip", prof["q"]), ("phase_noise", prof["sigma"])]
     for n in prof["n_modes"]:
@@ -126,6 +126,9 @@ def bench_denoising(prof, seed, steps, resamples, level_ci):
                     ex_ci = wilson(exact, prof["trials"])
                     rt_ci = wilson(retrieved, prof["trials"])
                     control = (kind == "bit_flip" and lev == 0.0)
+                    if trial_sink is not None:  # round-3 re-analysis hook; does not change the returned results
+                        trial_sink.append({"n_modes": n, "cue_model": kind, "corruption": lev, "p_over_n": ratio,
+                                           "is_control": control, "gain": gain.copy(), "gain_vs_nearest": gain_n.copy()})
                     rows.append({
                         "n_modes": n, "cue_model": kind, "corruption": lev, "n_patterns": p, "p_over_n": ratio,
                         "trials": prof["trials"], "is_control": control,

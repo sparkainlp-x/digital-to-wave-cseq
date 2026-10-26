@@ -19,9 +19,12 @@ jobs:
         run: python benchmark_rigorous.py --full --json report_rigorous.json
       - name: Full round-2 benchmark (denoising, load-controlled scaling, complex64 at N=16384 if memory allows)
         run: python benchmark_round2.py --full --json report_round2.json
+      - name: Full round-3 benchmark (mechanism, correlated patterns, multiplicity, cache microbenchmark, large complex128)
+        run: python benchmark_round3.py --full --json report_round3.json
       - uses: actions/upload-artifact@v4
         with:
           name: benchmark_reports
           path: |
             report_rigorous.json
             report_round2.json
+            report_round3.json
