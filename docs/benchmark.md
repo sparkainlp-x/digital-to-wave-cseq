@@ -870,6 +870,10 @@ N = 2048 and 4096 as requested, N = 8192 as a declared extension; 1, 2, 3, 4 and
 | More BLAS threads make the 25-step complex128 recall faster | Supported: near-linear from 1 to 4 threads, repeatable across two runs (efficiency 0.87 to 1.22); default (8) threads 5.6 to 8.4 times. |
 | complex128 at N = 16384 in 2.2 to 3.5 s | Still not measured. Pre-declared estimate for 4 threads: 3.6 s (rejected by a hair); plain N^2 scaling from 8192: 2.05 to 2.10 s. Unresolved. |
 
+## Preregistration record
+
+The locked plans of rounds 1 to 4 (`benchmark_protocol*.json` and `.lock`, `docs/round2_plan.md` to `docs/round4_plan.md`, the protocol hashes and the commit ids at which each plan was committed before its experiments) are archived on Zenodo as a bundle with plain-text result summaries for rounds 3 and 4: [10.5281/zenodo.23675451](https://doi.org/10.5281/zenodo.23675451) (concept DOI [10.5281/zenodo.23675450](https://doi.org/10.5281/zenodo.23675450), CC-BY-4.0). The plans in the bundle contain no results; the summaries were added after the experiments and are marked as such. The archive and the git history are the author's own records, not an independent timestamp. The full reports are in `results/` in this repository.
+
 ## Limitations
 
 - **Shared machine.** Timings were taken on a shared 8-core box while other jobs were running. Load averages are stored per mode in the report; high load inflates and destabilises timings, most visibly with default BLAS threads. Rerun on an idle machine before quoting numbers.
