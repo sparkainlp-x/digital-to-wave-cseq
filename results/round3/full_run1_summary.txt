@@ -1,0 +1,20 @@
+profile=full protocol_locked=True protocol_sha256=b6365f500ea5a6c1e60c8eb4db1200c6c5980e027dd409e3895a1676ff5637d4
+mechanism: x_cells=8 trajectory_vs_recall_mismatches=0
+hypothesis a_crosstalk: supported
+hypothesis b_spurious: supported
+hypothesis c_mirror: rejected
+hypothesis d_truncation: supported
+hypothesis d_oscillation: rejected
+correlated rho=0.0: raw={'denoises': 24, 'degrades': 7, 'inconclusive': 5} bh={'denoises': 24, 'degrades': 7, 'inconclusive': 5}
+correlated rho=0.1: raw={'denoises': 12, 'degrades': 20, 'inconclusive': 4} bh={'denoises': 12, 'degrades': 20, 'inconclusive': 4}
+correlated rho=0.3: raw={'denoises': 20, 'degrades': 15, 'inconclusive': 1} bh={'denoises': 20, 'degrades': 15, 'inconclusive': 1}
+hypothesis e_correlation: partial_or_inconclusive
+round2_vs_cue: raw={'denoises': 61, 'degrades': 37, 'inconclusive': 10} holm={'denoises': 57, 'degrades': 36, 'inconclusive': 15} bh={'denoises': 61, 'degrades': 37, 'inconclusive': 10}
+round2_vs_nearest: raw={'denoises': 0, 'degrades': 79, 'inconclusive': 29} holm={'denoises': 0, 'degrades': 72, 'inconclusive': 36} bh={'denoises': 0, 'degrades': 78, 'inconclusive': 30}
+round-2 stored cells reproduced: True (mismatches 0)
+cache[blas_threads_1]: m1=supported m2=supported
+complex128_large[blas_threads_1]: measured N=[8192, 10240, 14336]
+cache[blas_threads_default]: m1=rejected m2=rejected
+complex128_large[blas_threads_default]: measured N=[8192, 10240, 12288, 14336]
+deterministic_sha256: a0f0b96e32855a4c2f926dd208d6154d606ab718a3abcf66ee0e25995e71fad7
+wrote: /workspace/r3_full1.json
