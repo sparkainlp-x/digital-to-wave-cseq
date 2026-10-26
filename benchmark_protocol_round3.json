@@ -1,0 +1,177 @@
+{
+  "protocol": "cseq-wave-benchmark-round3/1",
+  "description": "Locked analysis plan for benchmark_round3.py (mechanism of the high-load degradation, correlated patterns, multiplicity re-analysis of the round-2 cells, cache microbenchmark for the step above N^2, large complex128 timing). Committed with its lock BEFORE benchmark_round3.py exists or any round-3 experiment has been run; the git history shows the order.",
+  "round1_protocol_sha256": "826e3e6870f9e3b95b605e2e70701067b970909f196b739d8e662dd06f094c9f",
+  "round2_protocol_sha256": "a06cd2e65d18d2eac28b57a1a74e8291ab5b81b7f31f28f7637685d8f8bcc27d",
+  "round2_commit": "64406dd792925b4307f8193d6a6ea4d88cddb89b",
+  "author_knowledge_at_writing": "Rounds 1 and 2 results are known (recall denoises at P/N <= 1/16, is worse than the cue at P/N >= 3/16, never beats a nearest-stored lookup; step above N^2 near 144 to 256 MiB working sets; reported L3 cache 320 MiB, L2 2 MiB per core, L1d 48 KiB per core on this VM). Also known before any round-3 data: (1) BPSK patterns are real, so the coupling matrix is real symmetric and the dynamics are synchronous +-1 Hopfield dynamics (verified numerically in the tests, not assumed); (2) classical cross-talk theory predicts a one-step bit error of Q(sqrt((N-1)/(P-1))) for an exact stored pattern with random patterns; (3) exactly orthogonal patterns (Hadamard rows) have zero cross-talk on an exact cue by algebra. No round-3 measurement existed when this file was written.",
+  "seed": 20261027,
+  "tests_for_multiplicity": {
+    "statistic": "paired per-trial gain (recall accuracy minus comparator accuracy); two-sided sign-flip permutation test of mean gain = 0 (assumes the gain distribution is symmetric about 0 under the null); p = (1 + #{|T*| >= |T_obs| - 1e-12}) / (1 + B); gains that are all exactly 0 give p = 1",
+    "permutations": {"quick": 2000, "full": 100000},
+    "corrections": ["Holm-Bonferroni (family-wise error rate)", "Benjamini-Hochberg (false discovery rate)"],
+    "alpha": 0.05,
+    "adjusted_verdict": "denoises / degrades if the adjusted p < alpha and the mean gain is > 0 / < 0, otherwise inconclusive",
+    "families": {
+      "round2_vs_cue": "the 108 non-control bit-flip and phase-noise cells of the round-2 full profile, gain over the corrupted cue",
+      "round2_vs_nearest": "the same 108 cells, recall minus nearest-stored-pattern accuracy",
+      "correlated_vs_cue": "all cells with q > 0 in the correlated-pattern experiment",
+      "mechanism_t25": "random-pattern cells with q > 0 in the mechanism experiment, gain at step 25"
+    }
+  },
+  "round2_reanalysis": {
+    "method": "rerun the round-2 full denoising profile with the same seed and per-trial output (benchmark_round2.bench_denoising with trial_sink; output unchanged); verify every cell reproduces results/round2/full_run1.json (recall, cue, nearest accuracy, gain, CI) exactly after rounding; then compute sign-flip p-values and Holm / BH adjusted verdicts. Report how many raw verdicts survive and which change. If the stored cells do not reproduce, report that as a failure.",
+    "families": ["round2_vs_cue", "round2_vs_nearest"]
+  },
+  "mechanism": {
+    "question": "WHY does recall become worse than the cue at high load?",
+    "recall_dynamics": "s <- exp(i*angle(W s)) repeated, W from HolographicMemory.finalize() (zero diagonal), identical to HolographicMemory.recall; trajectories are recorded for 100 steps (bits at every step) and checked equal to mem.recall(steps=t) at t = 25.",
+    "pattern_kinds": ["random", "hadamard"],
+    "hadamard_note": "P distinct rows drawn at random from rows 1..N-1 of the Sylvester Hadamard matrix of order N (exactly orthogonal, zero row sum); target = first drawn row; used as a zero-cross-talk causal control",
+    "n_modes": [64, 128, 256],
+    "p_over_n": [0.0625, 0.125, 0.1875, 0.25],
+    "q": [0.0, 0.1, 0.3],
+    "trials": 50,
+    "step_snapshots": [1, 2, 5, 10, 25, 50, 100],
+    "classification": {
+      "distance": "normalised Hamming distance d_mu between the final bit vector (step 100) and each stored pattern; the negated pattern has distance 1 - d_mu",
+      "tau_primary": 0.10,
+      "tau_sensitivity": [0.02, 0.05, 0.20],
+      "categories": {
+        "retrieved_target": "d_0 <= tau",
+        "retrieved_other_stored": "d_0 > tau and min_{mu != 0} d_mu <= tau",
+        "mirror_target": "1 - d_0 <= tau (final state is the negated target)",
+        "mirror_other": "1 - d_mu <= tau for some mu != 0 and not mirror_target",
+        "spurious": "d_mu > tau and 1 - d_mu > tau for every stored mu (not near any stored pattern or its negation)"
+      },
+      "precedence": "retrieved_target, retrieved_other_stored, mirror_target, mirror_other, spurious (first match; ties cannot occur for tau < 0.25)",
+      "dynamics_classes": "fixed point if bits at steps 98, 99, 100 are identical; period-2 cycle if bits(100) == bits(98) != bits(99); otherwise still moving. convergence step = first t <= 100 with bits(t) == bits(t-1), or 'not converged'."
+    },
+    "x_cells": "the random-pattern cells with q > 0 whose gain over the cue at step 25 is 'degrades' after Benjamini-Hochberg adjustment (family mechanism_t25); hypothesis verdicts below pool trials over these cells. If there are fewer than 3 x-cells every hypothesis is reported 'not testable'.",
+    "hypotheses": {
+      "a_crosstalk": {
+        "claim": "interference (cross-talk) from the other stored patterns causes the degradation",
+        "a1_test": "random patterns, q = 0: measured one-step error e1 = 1 - bit accuracy at step 1 versus the Gaussian cross-talk prediction Q(sqrt((N-1)/(P-1))). Testable cells: predicted error count over trials*N bits >= 5. A cell agrees if the prediction lies inside the 95% bootstrap CI of e1 or the ratio measured/predicted is within [1/1.5, 1.5].",
+        "a2_test": "orthogonal control: in the Hadamard kind the q = 0 one-step error must be exactly 0 (harness check, reported as a failure otherwise). For each x-cell, take the Hadamard cell with the same N, P/N, q and test its gain at step 25 the same way.",
+        "supports": "a1: >= 75% of testable cells agree and there are >= 3 testable cells; AND a2: in >= 80% of x-cells the Hadamard cell is NOT 'degrades' (BH-adjusted) and the mean final (step 25) accuracy of the Hadamard cells exceeds the random cells by >= 0.05",
+        "rejects": "in >= 50% of x-cells the Hadamard cell is also 'degrades', or a1 fails in more than half of testable cells",
+        "otherwise": "partial / inconclusive"
+      },
+      "b_spurious": {
+        "claim": "recall converges to spurious states (not near any stored pattern or its negation)",
+        "measure": "pooled fraction of x-cell trials classified 'spurious' at step 100, tau = 0.10, with a Wilson 95% CI",
+        "supports": "Wilson lower bound >= 0.50",
+        "rejects": "Wilson upper bound <= 0.10",
+        "otherwise": "partial / inconclusive",
+        "sensitivity": "same pooled fraction at tau in {0.02, 0.05, 0.20}"
+      },
+      "c_mirror": {
+        "claim": "recall converges to the negated stored pattern (global sign mirror)",
+        "measure": "pooled fraction of x-cell trials classified 'mirror_target' or 'mirror_other' at step 100, tau = 0.10, Wilson 95% CI",
+        "supports": "Wilson lower bound >= 0.10",
+        "rejects": "Wilson upper bound <= 0.05",
+        "otherwise": "partial / inconclusive"
+      },
+      "d_dynamics": {
+        "claim": "the 25-step recall is truncated, still moving, or oscillating",
+        "measures": "pooled over x-cells: mean accuracy at step 100 minus step 25 with a bootstrap CI; fraction of trials with bits(25) != bits(100); fraction period-2 at step 100 (Wilson); number of x-cells whose step-100 gain over the cue is no longer 'degrades' (BH-adjusted, family recomputed for step 100)",
+        "supports_truncation": "|mean accuracy change 25 -> 100| >= 0.02 AND fraction of trials with bits(25) != bits(100) >= 0.25",
+        "rejects_truncation": "|mean accuracy change| < 0.01 AND fraction changed <= 0.10 (the degradation is a converged property, not a transient)",
+        "supports_oscillation": "pooled period-2 fraction at step 100 has Wilson lower bound >= 0.10",
+        "rejects_oscillation": "Wilson upper bound <= 0.05",
+        "otherwise": "partial / inconclusive"
+      }
+    },
+    "profiles": {
+      "quick": {"n_modes": [64], "p_over_n": [0.0625, 0.25], "q": [0.0, 0.3], "trials": 10},
+      "full": {"n_modes": [64, 128, 256], "p_over_n": [0.0625, 0.125, 0.1875, 0.25], "q": [0.0, 0.1, 0.3], "trials": 50}
+    },
+    "bootstrap_resamples": 2000,
+    "ci_level": 0.95
+  },
+  "correlated": {
+    "question": "How do the capacity (exact-cue accuracy) and the denoising verdicts change when stored patterns are correlated?",
+    "generator": "common +-1 pattern c; each pattern bit equals c_i with probability (1 + sqrt(rho))/2, independently across patterns and bits. Marginals are uniform and the expected pairwise correlation between any two patterns is exactly rho. rho = 0 is plain random patterns with new seeds (an independent replication of round 2 for q = 0.1 and 0.3).",
+    "rho": [0.0, 0.1, 0.3],
+    "recall_steps": 25,
+    "n_modes": [64, 128, 256],
+    "p_over_n": [0.03125, 0.0625, 0.09375, 0.125, 0.1875, 0.25],
+    "q": [0.0, 0.1, 0.3],
+    "trials": 50,
+    "endpoints": "q = 0: recall bit accuracy with bootstrap CI, exact-recall fraction with Wilson CI, knee = smallest tested P/N with mean accuracy < 0.95 (as in round 1). q > 0: gain over the cue (paired bootstrap CI; raw verdict D/X/~; BH and Holm adjusted verdicts in the family correlated_vs_cue), gain versus nearest-stored (matched filter), realised mean pattern overlap.",
+    "hypothesis_e": {
+      "claim": "correlation shrinks the region where recall denoises",
+      "measure": "number of cells with BH-adjusted verdict 'denoises' per rho (36 cells per rho: 3 values of N x 6 values of P/N x 2 values of q > 0)",
+      "supports": "count(rho = 0.3) <= count(rho = 0) - 6",
+      "rejects": "count(rho = 0.3) >= count(rho = 0)",
+      "otherwise": "partial / inconclusive"
+    },
+    "replication_check": "for rho = 0, q in {0.1, 0.3} (36 cells) report how many raw verdicts equal the round-2 verdicts for the same N, P/N, q; differences are reported, not hidden.",
+    "profiles": {
+      "quick": {"n_modes": [64], "p_over_n": [0.0625, 0.25], "q": [0.0, 0.3], "rho": [0.0, 0.3], "trials": 10},
+      "full": {"n_modes": [64, 128, 256], "p_over_n": [0.03125, 0.0625, 0.09375, 0.125, 0.1875, 0.25], "q": [0.0, 0.1, 0.3], "rho": [0.0, 0.1, 0.3], "trials": 50}
+    },
+    "bootstrap_resamples": 2000,
+    "ci_level": 0.95
+  },
+  "cache_microbenchmark": {
+    "question": "Is the step above N^2 (matvec time per byte jumps up near working sets of 144 to 256 MiB) explained by cache or memory bandwidth?",
+    "cache_info": "parsed from /sys/devices/system/cpu/cpu0/cache/index* and lscpu: level, type, size, shared_cpu_list. Caches reported here are those of a KVM guest; the real share of the L3 available to this guest is unknown.",
+    "load_control": {"threshold_external_busy_cores": 0.5, "max_attempts": 4, "retry_wait_seconds": 10, "same_rule_as_round2": true},
+    "thread_modes": ["blas_threads_1", "blas_threads_default"],
+    "matvec": {
+      "operation": "w @ s for a dense N x N matrix, dtype complex128 and complex64; one sample = k matvecs where k = ceil(0.005 s / time of one matvec), per-op time = sample / k",
+      "n_list": [32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048, 2560, 3072, 3584, 4096, 5120, 6144, 8192],
+      "n_list_complex64_extra": [10240, 12288, 16384],
+      "samples": 15, "warmup": 2,
+      "memory_rule": "peak = matrix bytes + 64 MiB; measure only if peak <= 4 GiB and <= 0.5 * MemAvailable at the time of the check",
+      "metric": "effective matrix read bandwidth = matrix bytes / per-op time (GB/s); local log-log slope of time versus N"
+    },
+    "streaming_read": {
+      "operation": "numpy sum of a contiguous float64 array (single thread), bandwidth = array bytes / time",
+      "sizes_bytes": "geomspace from 16 KiB to 1 GiB, 49 points, each rounded to a multiple of 4096 bytes",
+      "samples": 15, "warmup": 2
+    },
+    "drop_event": "adjacent sizes in the measured series where the bandwidth falls to <= 0.75 of the previous point; boundary working set B = the two sizes that bracket it",
+    "hypotheses": {
+      "m1_reported_cache": {
+        "claim": "the matvec bandwidth drop coincides with a reported cache capacity",
+        "supports": "a matvec drop event (complex128, one thread) has its bracketing working sets W_lo <= C <= W_hi for some reported cache size C (per-core L1d, per-core L2, total L3)",
+        "rejects": "the matvec drop events exist but none brackets a reported cache size",
+        "otherwise": "inconclusive (no drop event, or too few points)"
+      },
+      "m2_streaming_drop": {
+        "claim": "the matvec bandwidth drop coincides with a drop in plain single-thread streaming read bandwidth, whatever the reported cache sizes",
+        "supports": "the bracket [W_lo, W_hi] of the complex128 one-thread matvec drop overlaps the bracket of a streaming-read drop event",
+        "rejects": "the streaming-read curve has no drop event overlapping the matvec drop",
+        "otherwise": "inconclusive"
+      },
+      "reading_rule": "A match is reported as 'consistent with', never as proof of mechanism; page-table (TLB) and hypervisor effects are not separated by this microbenchmark and are listed as untested alternatives."
+    },
+    "profiles": {
+      "quick": {"n_list": [64, 256, 512], "n_list_complex64_extra": [], "samples": 5, "warmup": 1, "streaming_points": 8},
+      "full": {"n_list": "as listed", "streaming_points": 49}
+    }
+  },
+  "complex128_large": {
+    "question": "Can complex128 be timed directly at a size close to 16384 without exceeding 4 GiB?",
+    "implementation": "benchmark_round3.py only: complex128 coupling matrix (16 N^2 bytes) built in 64 MiB row chunks from 8 random BPSK patterns (diagonal zeroed), recall loop identical to HolographicMemory.recall in complex128. Dense matvec time does not depend on the matrix values.",
+    "n_list": [8192, 10240, 12288, 14336],
+    "repeats": 5, "warmup": 2, "recall_steps": 25,
+    "peak_bytes_formula": "16*N^2 + 67108864",
+    "memory_rule": "peak <= 4 GiB AND peak <= 0.5 * MemAvailable; if the rule fails, poll every 30 s for up to 300 s and recheck before recording measured=false with the reason",
+    "thread_modes": ["blas_threads_1", "blas_threads_default"],
+    "load_control": "same external-busy-cores gate as round 2",
+    "cross_check": "N = 8192 is timed with this implementation so it can be compared with the HolographicMemory timing of round 2 (one thread 2.30 s, default threads 0.30 to 0.32 s)",
+    "extrapolation": "log-log fit on the load-controlled measured sizes of this list (>= 3 points); extrapolated to 16384 and labelled EXTRAPOLATED, NOT MEASURED, interval = bootstrap of per-N medians; compare with the original claim 2.2 to 3.5 s",
+    "profiles": {"quick": {"n_list": [512], "repeats": 3, "warmup": 1}, "full": {"n_list": "as listed"}}
+  },
+  "determinism": {
+    "hash_scope": "protocol hash, profile, seed, mechanism results, correlated-pattern results, multiplicity re-analysis (including permutation p-values), and the timing plans; excludes every timing, load measurement, memory-availability decision, cache information and everything derived from them",
+    "ci": "quick mode is run twice in CI and the deterministic_sha256 lines are diffed; full mode is manual only"
+  },
+  "reporting": {
+    "must_report": ["every hypothesis with its pre-declared verdict word (supported / rejected / partial-inconclusive / not testable) and the numbers behind it", "x-cells list", "round-2 multiplicity survivors and changes", "whether the round-2 stored cells reproduced", "discarded and uncontrolled timing batches", "the cache result as 'consistent with' or 'inconclusive'"],
+    "wording": "synthetic classical software; no quantum-hardware, QEC or quantum-advantage claim; timings are for this machine and this load"
+  }
+}

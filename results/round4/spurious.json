@@ -1,0 +1,2123 @@
+{
+  "protocol": "cseq-wave-benchmark-round4/1",
+  "protocol_sha256": "0b36a13189b51b91fedacf61336eb42a50d7daf077f00f80a3b9e4561803082f",
+  "protocol_locked": true,
+  "profile": "full",
+  "seed": 20261028,
+  "deterministic_sha256": "59341e60a9b8bbf9dfee21c10f5416afaf0856968cd80fff3a2b897e066893a8",
+  "hash_scope": "protocol hash, profile, seed, early-step results (held-out and selection), spurious-state results, the threads plan; excludes every timing, load measurement, memory decision, CPU/wall measurement and everything derived from them",
+  "early_step": null,
+  "spurious_states": {
+    "profile": "full",
+    "tau_stored": 0.1,
+    "tau_mixture": 0.15,
+    "n_final_states": 2700,
+    "n_non_stored": 2514,
+    "pooled_category_counts": {
+      "stored_target_pos": 142,
+      "stored_target_neg": 0,
+      "stored_other_pos": 21,
+      "stored_other_neg": 23,
+      "mixture_3": 1042,
+      "mixture_5": 604,
+      "partial_overlap": 135,
+      "unstructured": 733
+    },
+    "pooled_dynamics_by_category": {
+      "stored_target_pos": {
+        "fixed_point": 121,
+        "period_2": 0,
+        "still_moving": 21
+      },
+      "stored_target_neg": {
+        "fixed_point": 0,
+        "period_2": 0,
+        "still_moving": 0
+      },
+      "stored_other_pos": {
+        "fixed_point": 20,
+        "period_2": 0,
+        "still_moving": 1
+      },
+      "stored_other_neg": {
+        "fixed_point": 20,
+        "period_2": 0,
+        "still_moving": 3
+      },
+      "mixture_3": {
+        "fixed_point": 948,
+        "period_2": 0,
+        "still_moving": 94
+      },
+      "mixture_5": {
+        "fixed_point": 528,
+        "period_2": 0,
+        "still_moving": 76
+      },
+      "partial_overlap": {
+        "fixed_point": 94,
+        "period_2": 0,
+        "still_moving": 41
+      },
+      "unstructured": {
+        "fixed_point": 563,
+        "period_2": 0,
+        "still_moving": 170
+      }
+    },
+    "pooled_sensitivity_counts": {
+      "0.05/0.15": {
+        "stored": 94,
+        "mixture": 1734,
+        "partial_overlap": 139,
+        "unstructured": 733
+      },
+      "0.2/0.15": {
+        "stored": 852,
+        "mixture": 1004,
+        "partial_overlap": 111,
+        "unstructured": 733
+      },
+      "0.1/0.1": {
+        "stored": 186,
+        "mixture": 891,
+        "partial_overlap": 607,
+        "unstructured": 1016
+      },
+      "0.1/0.2": {
+        "stored": 186,
+        "mixture": 2310,
+        "partial_overlap": 6,
+        "unstructured": 198
+      }
+    },
+    "harness": {
+      "control_rates": {
+        "stored_5pct_flips_is_stored": 0.980741,
+        "mixture3_5pct_flips_is_mixture3": 0.962593,
+        "mixture5_5pct_flips_is_mixture5": 0.709259,
+        "mixture5_5pct_flips_is_mixture3_or_5": 0.866296,
+        "null_random_is_stored": 0.0,
+        "null_random_is_mixture": 0.0
+      },
+      "controls_per_rate": 2700,
+      "valid": true,
+      "control_rates_by_n_descriptive": {
+        "64": {
+          "stored_5pct_flips_is_stored": 0.955556,
+          "mixture3_5pct_flips_is_mixture3": 0.894444,
+          "mixture5_5pct_flips_is_mixture5": 0.447778,
+          "mixture5_5pct_flips_is_mixture3_or_5": 0.754444,
+          "null_random_is_stored": 0.0,
+          "null_random_is_mixture": 0.0
+        },
+        "128": {
+          "stored_5pct_flips_is_stored": 0.987778,
+          "mixture3_5pct_flips_is_mixture3": 0.993333,
+          "mixture5_5pct_flips_is_mixture5": 0.716667,
+          "mixture5_5pct_flips_is_mixture3_or_5": 0.861111,
+          "null_random_is_stored": 0.0,
+          "null_random_is_mixture": 0.0
+        },
+        "256": {
+          "stored_5pct_flips_is_stored": 0.998889,
+          "mixture3_5pct_flips_is_mixture3": 1.0,
+          "mixture5_5pct_flips_is_mixture5": 0.963333,
+          "mixture5_5pct_flips_is_mixture3_or_5": 0.983333,
+          "null_random_is_stored": 0.0,
+          "null_random_is_mixture": 0.0
+        }
+      }
+    },
+    "hypotheses": {
+      "Sp1_mixture_states": {
+        "k": 1646,
+        "n": 2514,
+        "wilson_95": [
+          0.635925,
+          0.67307
+        ],
+        "verdict": "supported"
+      },
+      "Sp2_unstructured": {
+        "k": 733,
+        "n": 2514,
+        "wilson_95": [
+          0.27413,
+          0.30964
+        ],
+        "verdict": "partial_or_inconclusive"
+      },
+      "Sp3_partial_overlap": {
+        "k": 135,
+        "n": 2514,
+        "wilson_95": [
+          0.045549,
+          0.063212
+        ],
+        "verdict": "rejected"
+      },
+      "Sp4_fixed_points": {
+        "k": 2133,
+        "n": 2514,
+        "wilson_95": [
+          0.833901,
+          0.861934
+        ],
+        "verdict": "supported"
+      },
+      "Sp5_mean_direction": {
+        "mean_cosine_final": 0.18957,
+        "mean_cosine_null": 0.071435,
+        "mean_difference": 0.118135,
+        "ci": [
+          0.112415,
+          0.124008
+        ],
+        "verdict": "supported"
+      }
+    },
+    "cells": [
+      {
+        "n_modes": 64,
+        "q": 0.0,
+        "n_patterns": 8,
+        "p_over_n": 0.125,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 40,
+          "stored_target_neg": 0,
+          "stored_other_pos": 2,
+          "stored_other_neg": 2,
+          "mixture_3": 53,
+          "mixture_5": 3,
+          "partial_overlap": 0,
+          "unstructured": 0
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 34,
+            "period_2": 0,
+            "still_moving": 6
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 2,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "mixture_3": {
+            "fixed_point": 44,
+            "period_2": 0,
+            "still_moving": 9
+          },
+          "mixture_5": {
+            "fixed_point": 2,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "partial_overlap": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "unstructured": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.53125,
+          0.65625,
+          0.75,
+          0.9375,
+          1.0
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.125,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.171875,
+        "energy_per_bit_final_non_stored_mean": -31.419643,
+        "energy_per_bit_stored_mean_same_trials": -31.778739
+      },
+      {
+        "n_modes": 64,
+        "q": 0.0,
+        "n_patterns": 12,
+        "p_over_n": 0.1875,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 8,
+          "stored_target_neg": 0,
+          "stored_other_pos": 1,
+          "stored_other_neg": 4,
+          "mixture_3": 76,
+          "mixture_5": 11,
+          "partial_overlap": 0,
+          "unstructured": 0
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 8,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 3,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "mixture_3": {
+            "fixed_point": 73,
+            "period_2": 0,
+            "still_moving": 3
+          },
+          "mixture_5": {
+            "fixed_point": 10,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "partial_overlap": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "unstructured": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.529687,
+          0.59375,
+          0.625,
+          0.726562,
+          0.878125
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.1875,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.1875,
+        "energy_per_bit_final_non_stored_mean": -33.506825,
+        "energy_per_bit_stored_mean_same_trials": -31.423312
+      },
+      {
+        "n_modes": 64,
+        "q": 0.0,
+        "n_patterns": 16,
+        "p_over_n": 0.25,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 1,
+          "stored_target_neg": 0,
+          "stored_other_pos": 1,
+          "stored_other_neg": 2,
+          "mixture_3": 66,
+          "mixture_5": 30,
+          "partial_overlap": 0,
+          "unstructured": 0
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 2,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 65,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "mixture_5": {
+            "fixed_point": 27,
+            "period_2": 0,
+            "still_moving": 3
+          },
+          "partial_overlap": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "unstructured": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.5,
+          0.53125,
+          0.59375,
+          0.664062,
+          0.78125
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.203125,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.203125,
+        "energy_per_bit_final_non_stored_mean": -36.446615,
+        "energy_per_bit_stored_mean_same_trials": -31.483724
+      },
+      {
+        "n_modes": 64,
+        "q": 0.1,
+        "n_patterns": 8,
+        "p_over_n": 0.125,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 43,
+          "stored_target_neg": 0,
+          "stored_other_pos": 3,
+          "stored_other_neg": 2,
+          "mixture_3": 49,
+          "mixture_5": 3,
+          "partial_overlap": 0,
+          "unstructured": 0
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 37,
+            "period_2": 0,
+            "still_moving": 6
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 2,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "stored_other_neg": {
+            "fixed_point": 2,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 41,
+            "period_2": 0,
+            "still_moving": 8
+          },
+          "mixture_5": {
+            "fixed_point": 3,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "partial_overlap": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "unstructured": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.560937,
+          0.6875,
+          0.78125,
+          0.96875,
+          1.0
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.109375,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.15625,
+        "energy_per_bit_final_non_stored_mean": -31.296875,
+        "energy_per_bit_stored_mean_same_trials": -31.548678
+      },
+      {
+        "n_modes": 64,
+        "q": 0.1,
+        "n_patterns": 12,
+        "p_over_n": 0.1875,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 7,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 2,
+          "mixture_3": 81,
+          "mixture_5": 10,
+          "partial_overlap": 0,
+          "unstructured": 0
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 7,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 2,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 77,
+            "period_2": 0,
+            "still_moving": 4
+          },
+          "mixture_5": {
+            "fixed_point": 10,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "partial_overlap": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "unstructured": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.529687,
+          0.59375,
+          0.625,
+          0.71875,
+          0.814062
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.1875,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.1875,
+        "energy_per_bit_final_non_stored_mean": -34.013393,
+        "energy_per_bit_stored_mean_same_trials": -31.675824
+      },
+      {
+        "n_modes": 64,
+        "q": 0.1,
+        "n_patterns": 16,
+        "p_over_n": 0.25,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 2,
+          "stored_target_neg": 0,
+          "stored_other_pos": 1,
+          "stored_other_neg": 0,
+          "mixture_3": 76,
+          "mixture_5": 20,
+          "partial_overlap": 1,
+          "unstructured": 0
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 2,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 74,
+            "period_2": 0,
+            "still_moving": 2
+          },
+          "mixture_5": {
+            "fixed_point": 20,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "partial_overlap": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "unstructured": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.5,
+          0.5625,
+          0.59375,
+          0.6875,
+          0.78125
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.203125,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.203125,
+        "energy_per_bit_final_non_stored_mean": -37.855026,
+        "energy_per_bit_stored_mean_same_trials": -31.432184
+      },
+      {
+        "n_modes": 64,
+        "q": 0.3,
+        "n_patterns": 8,
+        "p_over_n": 0.125,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 17,
+          "stored_target_neg": 0,
+          "stored_other_pos": 5,
+          "stored_other_neg": 5,
+          "mixture_3": 69,
+          "mixture_5": 3,
+          "partial_overlap": 1,
+          "unstructured": 0
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 15,
+            "period_2": 0,
+            "still_moving": 2
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 5,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 5,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 64,
+            "period_2": 0,
+            "still_moving": 5
+          },
+          "mixture_5": {
+            "fixed_point": 3,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "partial_overlap": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "unstructured": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.53125,
+          0.625,
+          0.71875,
+          0.820312,
+          1.0
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.140625,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.171875,
+        "energy_per_bit_final_non_stored_mean": -31.853596,
+        "energy_per_bit_stored_mean_same_trials": -31.666738
+      },
+      {
+        "n_modes": 64,
+        "q": 0.3,
+        "n_patterns": 12,
+        "p_over_n": 0.1875,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 1,
+          "stored_target_neg": 0,
+          "stored_other_pos": 3,
+          "stored_other_neg": 1,
+          "mixture_3": 84,
+          "mixture_5": 11,
+          "partial_overlap": 0,
+          "unstructured": 0
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 3,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 81,
+            "period_2": 0,
+            "still_moving": 3
+          },
+          "mixture_5": {
+            "fixed_point": 11,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "partial_overlap": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "unstructured": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.529687,
+          0.59375,
+          0.65625,
+          0.71875,
+          0.782812
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.171875,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.171875,
+        "energy_per_bit_final_non_stored_mean": -35.429276,
+        "energy_per_bit_stored_mean_same_trials": -31.520559
+      },
+      {
+        "n_modes": 64,
+        "q": 0.3,
+        "n_patterns": 16,
+        "p_over_n": 0.25,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 2,
+          "stored_target_neg": 0,
+          "stored_other_pos": 4,
+          "stored_other_neg": 3,
+          "mixture_3": 75,
+          "mixture_5": 15,
+          "partial_overlap": 0,
+          "unstructured": 1
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 2,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 4,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 3,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 74,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "mixture_5": {
+            "fixed_point": 13,
+            "period_2": 0,
+            "still_moving": 2
+          },
+          "partial_overlap": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "unstructured": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.46875,
+          0.5625,
+          0.625,
+          0.71875,
+          0.814062
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.1875,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.1875,
+        "energy_per_bit_final_non_stored_mean": -36.668956,
+        "energy_per_bit_stored_mean_same_trials": -31.399382
+      },
+      {
+        "n_modes": 128,
+        "q": 0.0,
+        "n_patterns": 16,
+        "p_over_n": 0.125,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 11,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 1,
+          "mixture_3": 69,
+          "mixture_5": 19,
+          "partial_overlap": 0,
+          "unstructured": 0
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 6,
+            "period_2": 0,
+            "still_moving": 5
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "mixture_3": {
+            "fixed_point": 54,
+            "period_2": 0,
+            "still_moving": 15
+          },
+          "mixture_5": {
+            "fixed_point": 13,
+            "period_2": 0,
+            "still_moving": 6
+          },
+          "partial_overlap": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "unstructured": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.453125,
+          0.542969,
+          0.609375,
+          0.691406,
+          0.875781
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.195312,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.203125,
+        "energy_per_bit_final_non_stored_mean": -62.938743,
+        "energy_per_bit_stored_mean_same_trials": -63.460405
+      },
+      {
+        "n_modes": 128,
+        "q": 0.0,
+        "n_patterns": 24,
+        "p_over_n": 0.1875,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 39,
+          "mixture_5": 45,
+          "partial_overlap": 7,
+          "unstructured": 9
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 32,
+            "period_2": 0,
+            "still_moving": 7
+          },
+          "mixture_5": {
+            "fixed_point": 43,
+            "period_2": 0,
+            "still_moving": 2
+          },
+          "partial_overlap": {
+            "fixed_point": 5,
+            "period_2": 0,
+            "still_moving": 2
+          },
+          "unstructured": {
+            "fixed_point": 8,
+            "period_2": 0,
+            "still_moving": 1
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.40625,
+          0.480469,
+          0.539062,
+          0.578125,
+          0.65625
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.230469,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.230469,
+        "energy_per_bit_final_non_stored_mean": -70.664062,
+        "energy_per_bit_stored_mean_same_trials": -63.808906
+      },
+      {
+        "n_modes": 128,
+        "q": 0.0,
+        "n_patterns": 32,
+        "p_over_n": 0.25,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 22,
+          "mixture_5": 54,
+          "partial_overlap": 8,
+          "unstructured": 16
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 22,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_5": {
+            "fixed_point": 52,
+            "period_2": 0,
+            "still_moving": 2
+          },
+          "partial_overlap": {
+            "fixed_point": 7,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "unstructured": {
+            "fixed_point": 15,
+            "period_2": 0,
+            "still_moving": 1
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.405469,
+          0.453125,
+          0.5,
+          0.546875,
+          0.625
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.25,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.25,
+        "energy_per_bit_final_non_stored_mean": -77.122344,
+        "energy_per_bit_stored_mean_same_trials": -63.087109
+      },
+      {
+        "n_modes": 128,
+        "q": 0.1,
+        "n_patterns": 16,
+        "p_over_n": 0.125,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 8,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 68,
+          "mixture_5": 19,
+          "partial_overlap": 4,
+          "unstructured": 1
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 6,
+            "period_2": 0,
+            "still_moving": 2
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 49,
+            "period_2": 0,
+            "still_moving": 19
+          },
+          "mixture_5": {
+            "fixed_point": 14,
+            "period_2": 0,
+            "still_moving": 5
+          },
+          "partial_overlap": {
+            "fixed_point": 3,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "unstructured": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.467969,
+          0.542969,
+          0.59375,
+          0.660156,
+          0.844531
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.203125,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.207031,
+        "energy_per_bit_final_non_stored_mean": -63.590183,
+        "energy_per_bit_stored_mean_same_trials": -63.529552
+      },
+      {
+        "n_modes": 128,
+        "q": 0.1,
+        "n_patterns": 24,
+        "p_over_n": 0.1875,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 39,
+          "mixture_5": 47,
+          "partial_overlap": 3,
+          "unstructured": 11
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 35,
+            "period_2": 0,
+            "still_moving": 4
+          },
+          "mixture_5": {
+            "fixed_point": 46,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "partial_overlap": {
+            "fixed_point": 2,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "unstructured": {
+            "fixed_point": 10,
+            "period_2": 0,
+            "still_moving": 1
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.390625,
+          0.46875,
+          0.515625,
+          0.566406,
+          0.641406
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.242188,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.242188,
+        "energy_per_bit_final_non_stored_mean": -71.298906,
+        "energy_per_bit_stored_mean_same_trials": -63.163516
+      },
+      {
+        "n_modes": 128,
+        "q": 0.1,
+        "n_patterns": 32,
+        "p_over_n": 0.25,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 24,
+          "mixture_5": 48,
+          "partial_overlap": 10,
+          "unstructured": 18
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 23,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "mixture_5": {
+            "fixed_point": 46,
+            "period_2": 0,
+            "still_moving": 2
+          },
+          "partial_overlap": {
+            "fixed_point": 8,
+            "period_2": 0,
+            "still_moving": 2
+          },
+          "unstructured": {
+            "fixed_point": 16,
+            "period_2": 0,
+            "still_moving": 2
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.390625,
+          0.4375,
+          0.492188,
+          0.546875,
+          0.610156
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.253906,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.253906,
+        "energy_per_bit_final_non_stored_mean": -77.677188,
+        "energy_per_bit_stored_mean_same_trials": -63.383516
+      },
+      {
+        "n_modes": 128,
+        "q": 0.3,
+        "n_patterns": 16,
+        "p_over_n": 0.125,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 2,
+          "stored_target_neg": 0,
+          "stored_other_pos": 1,
+          "stored_other_neg": 0,
+          "mixture_3": 68,
+          "mixture_5": 28,
+          "partial_overlap": 1,
+          "unstructured": 0
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 2,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 60,
+            "period_2": 0,
+            "still_moving": 8
+          },
+          "mixture_5": {
+            "fixed_point": 23,
+            "period_2": 0,
+            "still_moving": 5
+          },
+          "partial_overlap": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "unstructured": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.452344,
+          0.515625,
+          0.578125,
+          0.65625,
+          0.766406
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.210938,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.210938,
+        "energy_per_bit_final_non_stored_mean": -64.076836,
+        "energy_per_bit_stored_mean_same_trials": -63.464401
+      },
+      {
+        "n_modes": 128,
+        "q": 0.3,
+        "n_patterns": 24,
+        "p_over_n": 0.1875,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 1,
+          "mixture_3": 44,
+          "mixture_5": 43,
+          "partial_overlap": 3,
+          "unstructured": 9
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 44,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_5": {
+            "fixed_point": 39,
+            "period_2": 0,
+            "still_moving": 4
+          },
+          "partial_overlap": {
+            "fixed_point": 3,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "unstructured": {
+            "fixed_point": 9,
+            "period_2": 0,
+            "still_moving": 0
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.40625,
+          0.46875,
+          0.515625,
+          0.578125,
+          0.641406
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.242188,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.242188,
+        "energy_per_bit_final_non_stored_mean": -73.215593,
+        "energy_per_bit_stored_mean_same_trials": -63.513652
+      },
+      {
+        "n_modes": 128,
+        "q": 0.3,
+        "n_patterns": 32,
+        "p_over_n": 0.25,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 23,
+          "mixture_5": 53,
+          "partial_overlap": 6,
+          "unstructured": 18
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 23,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_5": {
+            "fixed_point": 49,
+            "period_2": 0,
+            "still_moving": 4
+          },
+          "partial_overlap": {
+            "fixed_point": 6,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "unstructured": {
+            "fixed_point": 17,
+            "period_2": 0,
+            "still_moving": 1
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.40625,
+          0.464844,
+          0.515625,
+          0.546875,
+          0.640625
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.242188,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.242188,
+        "energy_per_bit_final_non_stored_mean": -78.417344,
+        "energy_per_bit_stored_mean_same_trials": -63.215078
+      },
+      {
+        "n_modes": 256,
+        "q": 0.0,
+        "n_patterns": 32,
+        "p_over_n": 0.125,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 3,
+          "mixture_5": 46,
+          "partial_overlap": 15,
+          "unstructured": 36
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 2,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "mixture_5": {
+            "fixed_point": 30,
+            "period_2": 0,
+            "still_moving": 16
+          },
+          "partial_overlap": {
+            "fixed_point": 5,
+            "period_2": 0,
+            "still_moving": 10
+          },
+          "unstructured": {
+            "fixed_point": 21,
+            "period_2": 0,
+            "still_moving": 15
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.374219,
+          0.414062,
+          0.46875,
+          0.533203,
+          0.609766
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.265625,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.265625,
+        "energy_per_bit_final_non_stored_mean": -130.102266,
+        "energy_per_bit_stored_mean_same_trials": -127.441289
+      },
+      {
+        "n_modes": 256,
+        "q": 0.0,
+        "n_patterns": 48,
+        "p_over_n": 0.1875,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 0,
+          "mixture_5": 15,
+          "partial_overlap": 9,
+          "unstructured": 76
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_5": {
+            "fixed_point": 10,
+            "period_2": 0,
+            "still_moving": 5
+          },
+          "partial_overlap": {
+            "fixed_point": 6,
+            "period_2": 0,
+            "still_moving": 3
+          },
+          "unstructured": {
+            "fixed_point": 54,
+            "period_2": 0,
+            "still_moving": 22
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.335938,
+          0.382812,
+          0.414062,
+          0.460938,
+          0.516016
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.292969,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.292969,
+        "energy_per_bit_final_non_stored_mean": -147.869141,
+        "energy_per_bit_stored_mean_same_trials": -127.752969
+      },
+      {
+        "n_modes": 256,
+        "q": 0.0,
+        "n_patterns": 64,
+        "p_over_n": 0.25,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 0,
+          "mixture_5": 3,
+          "partial_overlap": 5,
+          "unstructured": 92
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_5": {
+            "fixed_point": 3,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "partial_overlap": {
+            "fixed_point": 4,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "unstructured": {
+            "fixed_point": 78,
+            "period_2": 0,
+            "still_moving": 14
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.3125,
+          0.359375,
+          0.390625,
+          0.4375,
+          0.501172
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.304688,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.304688,
+        "energy_per_bit_final_non_stored_mean": -161.729766,
+        "energy_per_bit_stored_mean_same_trials": -127.738789
+      },
+      {
+        "n_modes": 256,
+        "q": 0.1,
+        "n_patterns": 32,
+        "p_over_n": 0.125,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 7,
+          "mixture_5": 28,
+          "partial_overlap": 14,
+          "unstructured": 51
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 5,
+            "period_2": 0,
+            "still_moving": 2
+          },
+          "mixture_5": {
+            "fixed_point": 21,
+            "period_2": 0,
+            "still_moving": 7
+          },
+          "partial_overlap": {
+            "fixed_point": 8,
+            "period_2": 0,
+            "still_moving": 6
+          },
+          "unstructured": {
+            "fixed_point": 32,
+            "period_2": 0,
+            "still_moving": 19
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.367188,
+          0.419922,
+          0.453125,
+          0.515625,
+          0.633984
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.273438,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.273438,
+        "energy_per_bit_final_non_stored_mean": -131.261953,
+        "energy_per_bit_stored_mean_same_trials": -127.594727
+      },
+      {
+        "n_modes": 256,
+        "q": 0.1,
+        "n_patterns": 48,
+        "p_over_n": 0.1875,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 1,
+          "mixture_5": 5,
+          "partial_overlap": 9,
+          "unstructured": 85
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_5": {
+            "fixed_point": 4,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "partial_overlap": {
+            "fixed_point": 6,
+            "period_2": 0,
+            "still_moving": 3
+          },
+          "unstructured": {
+            "fixed_point": 57,
+            "period_2": 0,
+            "still_moving": 28
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.328125,
+          0.375,
+          0.414062,
+          0.453125,
+          0.515625
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.292969,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.292969,
+        "energy_per_bit_final_non_stored_mean": -146.404219,
+        "energy_per_bit_stored_mean_same_trials": -127.278711
+      },
+      {
+        "n_modes": 256,
+        "q": 0.1,
+        "n_patterns": 64,
+        "p_over_n": 0.25,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 0,
+          "mixture_5": 5,
+          "partial_overlap": 7,
+          "unstructured": 88
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_5": {
+            "fixed_point": 4,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "partial_overlap": {
+            "fixed_point": 7,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "unstructured": {
+            "fixed_point": 76,
+            "period_2": 0,
+            "still_moving": 12
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.320312,
+          0.359375,
+          0.390625,
+          0.445312,
+          0.532422
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.304688,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.304688,
+        "energy_per_bit_final_non_stored_mean": -161.100703,
+        "energy_per_bit_stored_mean_same_trials": -127.965977
+      },
+      {
+        "n_modes": 256,
+        "q": 0.3,
+        "n_patterns": 32,
+        "p_over_n": 0.125,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 4,
+          "mixture_5": 32,
+          "partial_overlap": 16,
+          "unstructured": 48
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 3,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "mixture_5": {
+            "fixed_point": 25,
+            "period_2": 0,
+            "still_moving": 7
+          },
+          "partial_overlap": {
+            "fixed_point": 11,
+            "period_2": 0,
+            "still_moving": 5
+          },
+          "unstructured": {
+            "fixed_point": 35,
+            "period_2": 0,
+            "still_moving": 13
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.367188,
+          0.414062,
+          0.453125,
+          0.515625,
+          0.609766
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.273438,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.273438,
+        "energy_per_bit_final_non_stored_mean": -134.710391,
+        "energy_per_bit_stored_mean_same_trials": -127.743008
+      },
+      {
+        "n_modes": 256,
+        "q": 0.3,
+        "n_patterns": 48,
+        "p_over_n": 0.1875,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 1,
+          "mixture_5": 7,
+          "partial_overlap": 8,
+          "unstructured": 84
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_5": {
+            "fixed_point": 6,
+            "period_2": 0,
+            "still_moving": 1
+          },
+          "partial_overlap": {
+            "fixed_point": 6,
+            "period_2": 0,
+            "still_moving": 2
+          },
+          "unstructured": {
+            "fixed_point": 65,
+            "period_2": 0,
+            "still_moving": 19
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.335938,
+          0.375,
+          0.414062,
+          0.460938,
+          0.539453
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.292969,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.292969,
+        "energy_per_bit_final_non_stored_mean": -148.739219,
+        "energy_per_bit_stored_mean_same_trials": -127.2875
+      },
+      {
+        "n_modes": 256,
+        "q": 0.3,
+        "n_patterns": 64,
+        "p_over_n": 0.25,
+        "trials": 100,
+        "category_counts": {
+          "stored_target_pos": 0,
+          "stored_target_neg": 0,
+          "stored_other_pos": 0,
+          "stored_other_neg": 0,
+          "mixture_3": 1,
+          "mixture_5": 1,
+          "partial_overlap": 8,
+          "unstructured": 90
+        },
+        "dynamics_by_category": {
+          "stored_target_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_target_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_pos": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "stored_other_neg": {
+            "fixed_point": 0,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_3": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "mixture_5": {
+            "fixed_point": 1,
+            "period_2": 0,
+            "still_moving": 0
+          },
+          "partial_overlap": {
+            "fixed_point": 5,
+            "period_2": 0,
+            "still_moving": 3
+          },
+          "unstructured": {
+            "fixed_point": 68,
+            "period_2": 0,
+            "still_moving": 22
+          }
+        },
+        "max_overlap_all_states_quantiles_5_25_50_75_95": [
+          0.3125,
+          0.365234,
+          0.394531,
+          0.431641,
+          0.508594
+        ],
+        "nearest_stored_symmetric_distance_median_all": 0.302734,
+        "nearest_stored_symmetric_distance_median_non_stored": 0.302734,
+        "energy_per_bit_final_non_stored_mean": -159.990078,
+        "energy_per_bit_stored_mean_same_trials": -127.263867
+      }
+    ]
+  },
+  "timing": {
+    "plan": {
+      "n_list": [
+        2048,
+        4096,
+        8192
+      ],
+      "thread_modes": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "default"
+      ],
+      "runs": 2,
+      "run_order": {
+        "run1": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "default"
+        ],
+        "run2": [
+          "default",
+          "4",
+          "3",
+          "2",
+          "1"
+        ]
+      },
+      "repeats": 7,
+      "warmup": 2,
+      "steps": 25,
+      "load_control": {
+        "threshold_external_busy_cores": 0.5,
+        "max_attempts": 4,
+        "retry_wait_seconds": 10
+      },
+      "max_peak_bytes": 4294967296,
+      "wait_for_memory_seconds": 300
+    }
+  },
+  "limitations": [
+    "Synthetic classical software; no quantum-hardware, QEC or quantum-advantage claim.",
+    "Early-step results hold for random patterns, bit-flip cues and the listed N and P/N only.",
+    "Spurious-state categories are heuristic (greedy mixture detection); a state can be near a mixture of other patterns than the top-k overlaps.",
+    "Thread timings are for this shared VM; a thread setting that did not take effect is flagged through cpu_over_wall."
+  ],
+  "part": "spurious"
+}

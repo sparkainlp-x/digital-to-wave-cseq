@@ -1,0 +1,9 @@
+profile=full protocol_locked=True protocol_sha256=0b36a13189b51b91fedacf61336eb42a50d7daf077f00f80a3b9e4561803082f
+spurious: harness_valid=True non_stored=2514/2700
+spurious Sp1_mixture_states: supported
+spurious Sp2_unstructured: partial_or_inconclusive
+spurious Sp3_partial_overlap: rejected
+spurious Sp4_fixed_points: supported
+spurious Sp5_mean_direction: supported
+deterministic_sha256: 59341e60a9b8bbf9dfee21c10f5416afaf0856968cd80fff3a2b897e066893a8
+wrote: results/round4/spurious.json

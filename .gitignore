@@ -3,3 +3,13 @@ __pycache__/
 *.pyc
 .pytest_cache/
 evidence_passport_verified.json
+report.json
+bench*.txt
+rig*.txt
+report_rigorous.json
+r2*.txt
+report_round2.json
+r3*.txt
+report_round3.json
+r4*.txt
+report_round4.json

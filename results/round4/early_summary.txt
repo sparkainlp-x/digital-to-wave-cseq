@@ -1,0 +1,8 @@
+profile=full protocol_locked=True protocol_sha256=0b36a13189b51b91fedacf61336eb42a50d7daf077f00f80a3b9e4561803082f
+early: s_star=2 mismatches=0
+early E1a_early_vs_step25: supported higher=18/18 pooled=0.10041 ci=[0.098016, 0.102823]
+early E1b_early_vs_step1: rejected higher=5/18 pooled=-0.015121 ci=[-0.016329, -0.013916]
+early E2a_stop_vs_step25: supported higher=18/18 pooled=0.116767 ci=[0.114138, 0.11935]
+early E2b_stop_vs_cue: supported higher=18/18 pooled=0.098798 ci=[0.097364, 0.100221]
+deterministic_sha256: 3a52bc807acecf48ed34f10e096c232f2a2b74f5213ad76f45f0a0f1fcde7625
+wrote: results/round4/early.json

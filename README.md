@@ -71,6 +71,16 @@ A cue with 20% of its phases flipped is pulled back to the exact stored pattern.
 
 Exact recall holds up to about 15 patterns (load 0.06) and breaks down past about 25 (load 0.10). Small reversals between rows are sampling noise. The full table, including fidelity, is in [results/sweeps.md](results/sweeps.md).
 
+## Benchmarks
+
+- `benchmark.py` (supplied unchanged): quick reverse / scaling / capacity checks.
+- `benchmark_rigorous.py`: locked analysis plan (`benchmark_protocol.json`), direct timings with bootstrap CIs in two BLAS-thread modes, a log-log fit on a range fixed in advance, capacity at the same P/N across N = 32 to 256 with null baselines, and adversarial reverse tests. `python benchmark_rigorous.py --quick` (CI) or `--full --json report_rigorous.json` (manual).
+- `benchmark_round2.py`: round-2 plan locked in `benchmark_protocol_round2.json` before the experiments: bit-flip denoising test (recall helps only at low load), load-controlled timings, complex64 timing at N = 16384.
+- `benchmark_round3.py`: round-3 plan locked in `benchmark_protocol_round3.json` before the experiments: why recall degrades at high load (cross-talk, spurious states), correlated patterns, multiplicity correction, cache microbenchmark, complex128 timed to N = 14336.
+- `benchmark_round4.py`: round-4 plan locked in `benchmark_protocol_round4.json` before the experiments: held-out early-stopping test, characterisation of the spurious states, BLAS thread counts for complex128 recall.
+
+complex128 at N = 16384 was never measured (estimates are labelled); complex64 was. Timings are machine- and load-dependent. See [docs/benchmark.md](docs/benchmark.md) for the numbers, the comparison with the original claims, and the limitations. SYNTHETIC classical software, no quantum-hardware claim.
+
 ## Limitations
 
 1. **The OES-32 flag does not detect correct recall** (v0.2.0 adds the calibrated cue gate for that). On the recall trajectory it fired in 200 of 200 runs for stored cues, never-stored cues, uniform-noise cues *and an empty memory* (mean scores 0.98 to 0.99). For a signal in [0, 1] the score is at least the signal's mean, and the trajectory approaches 1 whenever the dynamics settle. It is kept as a convergence flag.

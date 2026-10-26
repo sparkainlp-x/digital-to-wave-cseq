@@ -1,0 +1,7 @@
+profile=full protocol_locked=True protocol_sha256=0b36a13189b51b91fedacf61336eb42a50d7daf077f00f80a3b9e4561803082f
+threads T1_speedup: supported
+threads T2_monotone: supported
+threads T3_repeatability: not_testable
+threads T4_original_claim: rejected
+deterministic_sha256: a921aab2128226d89369aa024bab429786b9aee255e80390bd4a066c459827c9
+wrote: results/round4/threads_run2.json

@@ -1,0 +1,89 @@
+{
+  "protocol": "cseq-wave-benchmark-round2/1",
+  "description": "Locked analysis plan for benchmark_round2.py (denoising test, load-controlled scaling, memory-safe complex64 timing at N=16384). Committed with its lock BEFORE benchmark_round2.py exists or any round-2 experiment has been run; the git history shows the order.",
+  "round1_protocol_sha256": "826e3e6870f9e3b95b605e2e70701067b970909f196b739d8e662dd06f094c9f",
+  "round1_commit": "3e067401e6617f3537aa888aad3f14851c980813",
+  "author_knowledge_at_writing": "Round-1 results were already known: sigma <= 0.25 rad Gaussian phase noise never flips bits, so cue-only accuracy was 1.000 and recall was below it. The denoising question below was posed because of that gap. No bit-flip or complex64 result existed when this file was written.",
+  "prior_expectation": "Stated, not guaranteed: from classical Hopfield-network theory, recall should denoise a flipped cue when the load P/N is low and the flip fraction is inside the basin of attraction, with the gain shrinking or turning negative near and above the capacity knee. The experiment is designed so that 'no denoising anywhere' is a possible outcome and will be reported as such.",
+  "seed": 20261026,
+  "denoising": {
+    "recall_steps": 25,
+    "target": "first stored pattern; P random BPSK patterns stored, finalize() zeroes the diagonal",
+    "cue_models": {
+      "bit_flip": {"description": "each bit of the target flipped independently with probability q before BPSK encoding; q = 0 is the control (cue equals target)", "q": [0.0, 0.05, 0.10, 0.20, 0.30]},
+      "phase_noise": {"description": "Gaussian phase noise (radians) added to the target BPSK phases; sigma large enough to flip bits. Expected flip probability 2Q(pi/2/sigma): 0.081 at 0.9, 0.19 at 1.2; the realised flip fraction of the cue is measured and reported, not assumed", "sigma": [0.9, 1.2]}
+    },
+    "baselines": {
+      "cue_only": "hard-slice the corrupted cue itself (no memory)",
+      "nearest_stored": "return the stored pattern with the largest matched-filter overlap with the corrupted cue (HolographicMemory.overlaps); exactly 1.0 accuracy when it picks the target",
+      "random_pattern": "independent random bit string, null expectation 0.5"
+    },
+    "primary_endpoint": "gain_over_cue = recall_bit_accuracy - cue_only_bit_accuracy, computed per trial (paired on the same corrupted cue)",
+    "ci_method": "paired percentile bootstrap over trials of the mean gain, 2000 resamples, 95%",
+    "verdict_rule": "for each cell with corruption > 0: 'denoises' if the CI lower bound > 0; 'degrades' if the CI upper bound < 0; 'inconclusive' otherwise. No multiplicity correction is applied; counts of cells per verdict are reported per corruption level, and the verdict table is reported in full including negative cells.",
+    "secondary_endpoints": [
+      "recall_minus_nearest_stored (paired bootstrap, same rule)",
+      "exact_recall_fraction (recall equals target on every bit) with Wilson 95% interval",
+      "nearest_stored_retrieval_fraction (picked the target pattern) with Wilson 95% interval",
+      "realised flip fraction of the cue (mean)",
+      "control check: at q = 0 the cue accuracy must be exactly 1.0; any other value is reported as a failure of the harness"
+    ],
+    "headline_statement_rule": "'Recall denoises' is stated only for the set of (N, P/N, corruption) cells whose verdict is 'denoises', and the 'degrades' and 'inconclusive' cells are listed next to it. A single sentence about the whole system is not made.",
+    "mirror_state_note": "Complex Hopfield dynamics can converge to the global-phase mirror (all bits inverted). Bit accuracy is reported as measured, without folding the mirror, so mirror convergence counts as an error.",
+    "n_modes": [64, 128, 256],
+    "p_over_n": [0.03125, 0.0625, 0.09375, 0.125, 0.1875, 0.25],
+    "profiles": {
+      "quick": {"n_modes": [64], "p_over_n": [0.0625, 0.125], "q": [0.0, 0.1, 0.3], "sigma": [0.9], "trials": 10},
+      "full": {"n_modes": [64, 128, 256], "p_over_n": [0.03125, 0.0625, 0.09375, 0.125, 0.1875, 0.25], "q": [0.0, 0.05, 0.10, 0.20, 0.30], "sigma": [0.9, 1.2], "trials": 50}
+    },
+    "bootstrap_resamples": 2000,
+    "ci_level": 0.95
+  },
+  "scaling_round2": {
+    "purpose": "repeat the round-1 complex128 timings with load control, and add a memory-safe complex64 implementation so that N = 16384 can be timed directly",
+    "recall_steps": 25,
+    "thread_modes": ["blas_threads_1", "blas_threads_default"],
+    "load_control": {
+      "metric": "external_busy_cores = (system CPU busy seconds over the batch - this worker's own CPU seconds over the batch) / wall seconds, from /proc/stat and getrusage; so the benchmark's own threads are not counted as load",
+      "loadavg": "os.getloadavg() 1-minute value is recorded before and after every batch as information. It is not the gate, because it includes the benchmark's own threads (a healthy 8-thread run drives it to about 8).",
+      "batch": "one (thread mode, dtype, N) set of timed repeats",
+      "threshold_external_busy_cores": 0.5,
+      "max_attempts": 4,
+      "retry_wait_seconds": 10,
+      "rule": "a batch is accepted when external_busy_cores <= threshold; otherwise it is discarded and rerun up to max_attempts total attempts. If no attempt is accepted the last attempt is kept but flagged load_controlled=false, listed in the report, and EXCLUDED from the fit, the local slopes and the extrapolations. Discarded attempts are recorded in the report, not dropped silently.",
+      "fit_condition": "alpha is reported only if at least fit_min_points load-controlled points with N >= fit_min_n exist"
+    },
+    "complex128": {
+      "implementation": "unchanged HolographicMemory from cseq_wave.memory",
+      "n_list": [64, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096, 6144, 8192],
+      "repeats": 11, "repeats_large": 7, "large_from_n": 3072, "warmup_runs": 2,
+      "fit_min_n": 512, "fit_min_points": 3, "bootstrap_resamples": 2000, "ci_level": 0.95
+    },
+    "complex64": {
+      "implementation": "benchmark_round2.py only: a 8N^2-byte complex64 coupling matrix built in row chunks from 8 random BPSK patterns (diagonal zeroed), recall loop identical to HolographicMemory.recall (s = exp(i*angle(W s)), 25 steps) in complex64. Dense matvec time does not depend on the matrix values, so 8 stored patterns are used for timing. This is a different dtype from the original claim (complex128); it is NOT the same quantity.",
+      "n_list": [4096, 8192, 16384],
+      "repeats": 5, "warmup_runs": 2,
+      "peak_bytes_formula": "8*N^2 + 67108864 (matrix plus one 64 MiB row chunk and vectors)",
+      "memory_rule": "measure only if peak_bytes <= 4 GiB AND peak_bytes <= 0.5 * MemAvailable read immediately before allocation; otherwise record measured=false with the reason. N = 16384 needs 2.06 GiB peak.",
+      "agreement_check": {"description": "at N in {256, 512} and P in {4, 8}, 20 seeds each, compare recall bits of the complex64 implementation with HolographicMemory (complex128) on the same stored patterns and a q=0.1 flipped cue; report the fraction of identical bit vectors and the mean bit agreement. Any disagreement is reported, not hidden.", "n_modes": [256, 512], "n_patterns": [4, 8], "seeds": 20, "q": 0.1}
+    },
+    "complex128_estimate_at_16384": {
+      "status_label": "ESTIMATE, NOT MEASURED (complex128 at N = 16384 needs about 8 GiB peak)",
+      "method": "t128_est = t64_measured(16384) * median(t128(N)/t64(N)) using N = 8192 (primary) and N = 4096 (sensitivity), same thread mode, load-controlled batches only. Assumption, untested: the dtype ratio at 16384 equals the ratio at 8192.",
+      "compare_with_original_claim_seconds": [2.2, 3.5]
+    },
+    "local_slopes_complex64": "descriptive only (two adjacent pairs), no fit",
+    "profiles": {
+      "quick": {"complex128_n_list": [256, 512], "repeats": 5, "repeats_large": 5, "large_from_n": 99999, "complex64_n_list": [256, 512], "complex64_repeats": 3, "run_agreement_check": true},
+      "full": {"complex128_n_list": "as listed", "complex64_n_list": "as listed", "run_agreement_check": true}
+    }
+  },
+  "determinism": {
+    "hash_scope": "protocol hash, profile, seed, all denoising results (accuracies, CIs, Wilson intervals, verdicts), the agreement check, and the scaling plan; excludes every timing, every load measurement, every memory-availability decision and everything derived from them",
+    "ci": "quick mode is run twice in CI and the deterministic_sha256 lines are diffed; full mode is manual only"
+  },
+  "reporting": {
+    "must_report": ["every verdict cell including negative ones", "discarded and uncontrolled batches", "N=16384 complex64 measured or the reason it was not", "the complex128 N=16384 figure only under the ESTIMATE label"],
+    "wording": "synthetic classical software; no quantum-hardware, QEC or quantum-advantage claim; timings are for this machine and this load"
+  }
+}

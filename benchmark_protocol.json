@@ -1,0 +1,48 @@
+{
+  "protocol": "cseq-wave-benchmark-rigorous/1",
+  "description": "Locked analysis plan for benchmark_rigorous.py. Fit ranges, repeats, thresholds and seeds are fixed here BEFORE the full run is inspected. Changing this file changes its hash; the script refuses to run against a mismatching benchmark_protocol.lock unless --allow-protocol-change is given (the report then says protocol_locked=false).",
+  "seed": 20261025,
+  "scaling": {
+    "recall_steps": 25,
+    "thread_modes": ["blas_threads_1", "blas_threads_default"],
+    "warmup_runs": 2,
+    "fit_min_n": 512,
+    "fit_min_points": 3,
+    "bootstrap_resamples": 2000,
+    "ci_level": 0.95,
+    "theoretical_alpha": 2.0,
+    "extrapolate_to": [16384],
+    "max_peak_bytes": 4294967296,
+    "peak_bytes_factor": 2,
+    "holdout_check": {"fit_n_range": [512, 2048], "predict_n": [4096, 8192]},
+    "original_claims_checked": {
+      "alpha_range": [1.4, 1.5],
+      "recall25_seconds_at_4096_range": [0.3, 0.4],
+      "recall25_seconds_at_16384_range": [2.2, 3.5]
+    },
+    "profiles": {
+      "quick": {"n_list": [64, 128, 256, 512, 768, 1024], "repeats": 7, "repeats_large": 7, "large_from_n": 2048},
+      "full": {"n_list": [64, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096, 6144, 8192], "repeats": 11, "repeats_large": 7, "large_from_n": 3072}
+    }
+  },
+  "capacity": {
+    "recall_steps": 25,
+    "p_over_n": [0.03125, 0.0625, 0.09375, 0.125, 0.1875, 0.25, 0.375, 0.5],
+    "knee_accuracy_threshold": 0.95,
+    "knee_definition": "smallest tested P/N whose mean recall bit accuracy is below knee_accuracy_threshold; null if none",
+    "stable_if": "knee P/N identical across all N, or within one grid step",
+    "bootstrap_resamples": 2000,
+    "ci_level": 0.95,
+    "profiles": {
+      "quick": {"n_modes": [32, 64], "sigmas": [0.0, 0.1], "trials": 10},
+      "full": {"n_modes": [32, 64, 128, 256], "sigmas": [0.0, 0.1, 0.25], "trials": 40}
+    }
+  },
+  "reverse": {
+    "max_length": 300,
+    "profiles": {
+      "quick": {"seeds": 60},
+      "full": {"seeds": 500}
+    }
+  }
+}

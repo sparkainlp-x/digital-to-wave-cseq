@@ -1,0 +1,2 @@
+deterministic_sha256: 7e23f21a2695e1d0a75b52d56295bce29e0a3e86eda50ba30a13d9b9b6826281
+wrote: results/round4/assembled.json
