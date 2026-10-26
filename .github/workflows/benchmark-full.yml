@@ -21,6 +21,8 @@ jobs:
         run: python benchmark_round2.py --full --json report_round2.json
       - name: Full round-3 benchmark (mechanism, correlated patterns, multiplicity, cache microbenchmark, large complex128)
         run: python benchmark_round3.py --full --json report_round3.json
+      - name: Full round-4 benchmark (early-step peak, spurious states, BLAS thread counts)
+        run: python benchmark_round4.py --full --json report_round4.json
       - uses: actions/upload-artifact@v4
         with:
           name: benchmark_reports
@@ -28,3 +30,4 @@ jobs:
             report_rigorous.json
             report_round2.json
             report_round3.json
+            report_round4.json

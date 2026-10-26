@@ -51,6 +51,13 @@ jobs:
           cat r3a.txt
           grep -q "protocol_locked=True" r3a.txt
           diff r3a.txt r3b.txt
+      - name: Round-4 benchmark, quick mode twice (plan lock + deterministic hash)
+        run: |
+          python -W error benchmark_round4.py --quick | grep -E "protocol_locked=True|deterministic_sha256" > r4a.txt
+          python -W error benchmark_round4.py --quick | grep -E "protocol_locked=True|deterministic_sha256" > r4b.txt
+          cat r4a.txt
+          grep -q "protocol_locked=True" r4a.txt
+          diff r4a.txt r4b.txt
       - name: Legacy script tests
         run: python tests.py
       - name: Demo seeds 7 and 42
